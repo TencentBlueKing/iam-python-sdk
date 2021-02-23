@@ -1,0 +1,18 @@
+[flake8]
+ignore = W503,E203
+exclude =
+    *migrations*,
+    *.pyc,
+    .git,
+    __pycache__,
+    tmp/*,
+    */bin/*,
+    iam/__init__.py,
+    dist/*
+    build/*
+max-line-length=120
+max-complexity=12
+format=pylint
+show_source = True
+statistics = True
+count = True

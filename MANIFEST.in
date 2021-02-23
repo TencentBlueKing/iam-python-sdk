@@ -1,0 +1,1 @@
+recursive-include iam/contrib/iam_migration/templates *.tmpl
