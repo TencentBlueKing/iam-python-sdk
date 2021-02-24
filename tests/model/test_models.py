@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from iam.model.models import (SystemProviderConfig, System,
-                              ReferenceResourceType, ResourceProviderConfig, ResourceType,
-                              InstanceSelection, RelatedResourceType,
-                              Action, ActionTopology)
+from iam.model.models import (
+    SystemProviderConfig,
+    System,
+    ReferenceResourceType,
+    ResourceProviderConfig,
+    ResourceType,
+    InstanceSelection,
+    RelatedResourceType,
+    Action,
+    ActionTopology,
+)
 
 
 def test_models():

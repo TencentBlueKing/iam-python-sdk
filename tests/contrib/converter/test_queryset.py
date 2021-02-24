@@ -136,36 +136,14 @@ def test_any():
 def test_and():
     c = DjangoQuerySetConverter()
 
-    content = [
-        {
-            "op": "eq",
-            "field": "id",
-            "value": "1"
-        },
-        {
-            "op": "eq",
-            "field": "name",
-            "value": "test"
-        }
-    ]
+    content = [{"op": "eq", "field": "id", "value": "1"}, {"op": "eq", "field": "name", "value": "test"}]
     assertQEqual(c._and(content), (Q(id="1") & Q(name="test")))
 
 
 def test_or():
     c = DjangoQuerySetConverter()
 
-    content = [
-        {
-            "op": "eq",
-            "field": "id",
-            "value": "1"
-        },
-        {
-            "op": "eq",
-            "field": "name",
-            "value": "test"
-        }
-    ]
+    content = [{"op": "eq", "field": "id", "value": "1"}, {"op": "eq", "field": "name", "value": "test"}]
     assertQEqual(c._or(content), (Q(id="1") | Q(name="test")))
 
 
@@ -174,34 +152,13 @@ def test_convert():
 
     data = {
         "op": "AND",
-        "content": [
-            {
-                "op": "eq",
-                "field": "id",
-                "value": "1"
-            }, {
-                "op": "eq",
-                "field": "name",
-                "value": "test"
-            }
-        ],
+        "content": [{"op": "eq", "field": "id", "value": "1"}, {"op": "eq", "field": "name", "value": "test"}],
     }
     assertQEqual(c.convert(data), (Q(id="1") & Q(name="test")))
 
     data = {
         "op": "OR",
-        "content": [
-            {
-                "op": "eq",
-                "field": "id",
-                "value": "1"
-            },
-            {
-                "op": "eq",
-                "field": "name",
-                "value": "test"
-            }
-        ],
+        "content": [{"op": "eq", "field": "id", "value": "1"}, {"op": "eq", "field": "name", "value": "test"}],
     }
     assertQEqual(c.convert(data), (Q(id="1") | Q(name="test")))
 
@@ -215,18 +172,7 @@ def test_value_hooks():
 
     data = {
         "op": "AND",
-        "content": [
-            {
-                "op": "eq",
-                "field": "id",
-                "value": "1"
-            },
-            {
-                "op": "eq",
-                "field": "name",
-                "value": "test"
-            }
-        ],
+        "content": [{"op": "eq", "field": "id", "value": "1"}, {"op": "eq", "field": "name", "value": "test"}],
     }
     assertQEqual(c.convert(data), (Q(id="new_value") & Q(name="test")))
 
@@ -236,18 +182,7 @@ def test_value_hooks():
 
     data = {
         "op": "AND",
-        "content": [
-            {
-                "op": "eq",
-                "field": "id",
-                "value": "1"
-            },
-            {
-                "op": "eq",
-                "field": "name",
-                "value": "test"
-            }
-        ],
+        "content": [{"op": "eq", "field": "id", "value": "1"}, {"op": "eq", "field": "name", "value": "test"}],
     }
     assertQEqual(c.convert(data), (Q(id="1") & Q(name="test")))
 
@@ -262,18 +197,7 @@ def test_operator_map():
 
     data = {
         "op": "AND",
-        "content": [
-            {
-                "op": "lt",
-                "field": "id",
-                "value": "1"
-            },
-            {
-                "op": "eq",
-                "field": "name",
-                "value": "test"
-            }
-        ],
+        "content": [{"op": "lt", "field": "id", "value": "1"}, {"op": "eq", "field": "name", "value": "test"}],
     }
     c = TestOpMapConverter()
     assertQEqual(c.convert(data), (Q(id__lt="1") & Q(name__startswith="test")))

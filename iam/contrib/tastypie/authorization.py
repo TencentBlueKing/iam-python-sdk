@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 import six
 import abc
 import logging
@@ -19,7 +18,13 @@ logger = logging.getLogger("iam")
 @six.add_metaclass(abc.ABCMeta)
 class IAMAuthorizationHelper(object):
     def __init__(
-        self, system, create_action, read_action, update_action, delete_action, filter_key_mapping={},
+        self,
+        system,
+        create_action,
+        read_action,
+        update_action,
+        delete_action,
+        filter_key_mapping={},
     ):
         self.system = system
         self.create_action = create_action
@@ -79,7 +84,13 @@ class IAMCreateAuthorizationMixin(object):
         action = Action(self.helper.create_action)
         resources = self.helper.get_create_detail_resources(bundle)
 
-        request = Request(system, subject, action, resources, self.helper.get_create_detail_environment(bundle),)
+        request = Request(
+            system,
+            subject,
+            action,
+            resources,
+            self.helper.get_create_detail_environment(bundle),
+        )
 
         allowed = self.iam.is_allowed(request)
         logger.debug("tastypie create_detail is_allowed request({}) result: {}".format(request.to_dict(), allowed))
@@ -100,7 +111,13 @@ class IAMUpdateAuthorizationMixin(object):
         action = Action(self.helper.update_action)
         resources = self.helper.get_update_detail_resources(bundle)
 
-        request = Request(system, subject, action, resources, self.helper.get_update_detail_environment(bundle),)
+        request = Request(
+            system,
+            subject,
+            action,
+            resources,
+            self.helper.get_update_detail_environment(bundle),
+        )
 
         allowed = self.iam.is_allowed(request)
         logger.debug("tastypie update_detail is_allowed request({}) result: {}".format(request.to_dict(), allowed))
@@ -121,7 +138,13 @@ class IAMDeleteAuthorizationMixin(object):
         action = Action(self.helper.delete_action)
         resources = self.helper.get_delete_detail_resources(bundle)
 
-        request = Request(system, subject, action, resources, self.helper.get_delete_detail_environment(bundle),)
+        request = Request(
+            system,
+            subject,
+            action,
+            resources,
+            self.helper.get_delete_detail_environment(bundle),
+        )
 
         allowed = self.iam.is_allowed(request)
         logger.debug("tastypie delete_detail is_allowed request({}) result: {}".format(request.to_dict(), allowed))
@@ -139,7 +162,13 @@ class IAMReadDetailAuthorizationMixin(object):
         action = Action(self.helper.read_action)
         resources = self.helper.get_read_detail_resources(bundle)
 
-        request = Request(system, subject, action, resources, self.helper.get_read_detail_environment(bundle),)
+        request = Request(
+            system,
+            subject,
+            action,
+            resources,
+            self.helper.get_read_detail_environment(bundle),
+        )
 
         allowed = self.iam.is_allowed(request)
         logger.debug("tastypie read_detail is_allowed request({}) result: {}".format(request.to_dict(), allowed))
@@ -163,14 +192,18 @@ class IAMReadOnlyAuthorization(ReadOnlyAuthorization):
 
 
 class ReadOnlyCompleteListIAMAuthorization(
-    IAMReadDetailAuthorizationMixin, IAMReadOnlyAuthorization,
+    IAMReadDetailAuthorizationMixin,
+    IAMReadOnlyAuthorization,
 ):
     def read_list(self, object_list, bundle):
         return object_list
 
 
 class CustomCreateCompleteListIAMAuthorization(
-    IAMUpdateAuthorizationMixin, IAMDeleteAuthorizationMixin, IAMReadDetailAuthorizationMixin, IAMAuthorization,
+    IAMUpdateAuthorizationMixin,
+    IAMDeleteAuthorizationMixin,
+    IAMReadDetailAuthorizationMixin,
+    IAMAuthorization,
 ):
     def read_list(self, object_list, bundle):
         return object_list

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 class DispatchBaseException(Exception):
     pass
 

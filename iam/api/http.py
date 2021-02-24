@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 import logging
 
 import requests
@@ -18,27 +17,65 @@ def _gen_header():
 
 
 def _http_request(
-    method, url, headers=None, data=None, verify=False, cert=None, timeout=None, cookies=None,
+    method,
+    url,
+    headers=None,
+    data=None,
+    verify=False,
+    cert=None,
+    timeout=None,
+    cookies=None,
 ):
     resp = requests.Response()
     try:
         if method == "GET":
             resp = requests.get(
-                url=url, headers=headers, params=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+                url=url,
+                headers=headers,
+                params=data,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
             )
         elif method == "HEAD":
-            resp = requests.head(url=url, headers=headers, verify=verify, cert=cert, timeout=timeout, cookies=cookies,)
+            resp = requests.head(
+                url=url,
+                headers=headers,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
+            )
         elif method == "POST":
             resp = requests.post(
-                url=url, headers=headers, json=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+                url=url,
+                headers=headers,
+                json=data,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
             )
         elif method == "DELETE":
             resp = requests.delete(
-                url=url, headers=headers, json=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+                url=url,
+                headers=headers,
+                json=data,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
             )
         elif method == "PUT":
             resp = requests.put(
-                url=url, headers=headers, json=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+                url=url,
+                headers=headers,
+                json=data,
+                verify=verify,
+                cert=cert,
+                timeout=timeout,
+                cookies=cookies,
             )
         else:
             return False, None
@@ -78,7 +115,14 @@ def http_get(url, data, headers=None, verify=False, cert=None, timeout=None, coo
     if not headers:
         headers = _gen_header()
     return _http_request(
-        method="GET", url=url, headers=headers, data=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+        method="GET",
+        url=url,
+        headers=headers,
+        data=data,
+        verify=verify,
+        cert=cert,
+        timeout=timeout,
+        cookies=cookies,
     )
 
 
@@ -86,7 +130,14 @@ def http_post(url, data, headers=None, verify=False, cert=None, timeout=None, co
     if not headers:
         headers = _gen_header()
     return _http_request(
-        method="POST", url=url, headers=headers, data=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+        method="POST",
+        url=url,
+        headers=headers,
+        data=data,
+        verify=verify,
+        cert=cert,
+        timeout=timeout,
+        cookies=cookies,
     )
 
 
@@ -94,7 +145,14 @@ def http_put(url, data, headers=None, verify=False, cert=None, timeout=None, coo
     if not headers:
         headers = _gen_header()
     return _http_request(
-        method="PUT", url=url, headers=headers, data=data, verify=verify, cert=cert, timeout=timeout, cookies=cookies,
+        method="PUT",
+        url=url,
+        headers=headers,
+        data=data,
+        verify=verify,
+        cert=cert,
+        timeout=timeout,
+        cookies=cookies,
     )
 
 

@@ -8,7 +8,8 @@ except ImportError:
     from mock import patch, MagicMock
 
 import sys
-sys.modules['tastypie.exceptions'] = MagicMock()
+
+sys.modules["tastypie.exceptions"] = MagicMock()
 
 from iam.contrib.tastypie.shortcuts import allow_or_raise_immediate_response_for_resources_list
 from iam.exceptions import MultiAuthFailedException
@@ -60,4 +61,3 @@ def test_allow_or_raise_immediate_response_for_resources_list__raise():
             assert False, "allow_or_raise_auth_failed did not raise"
 
     Request.assert_called_once_with(system, subject, action, [], None)
-

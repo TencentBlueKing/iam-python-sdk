@@ -9,9 +9,7 @@ from iam import DictObject, ObjectSet
 
 
 def test_dict_object_with_dict():
-    data = {
-        "id": "hello"
-    }
+    data = {"id": "hello"}
 
     do = DictObject(data)
 
@@ -49,12 +47,8 @@ def test_dict_object_with_class():
 
 
 def test_object_set():
-    host = DictObject(obj={
-        "id": "192.168.1.1"
-    })
-    module = DictObject(obj={
-        "id": "iam"
-    })
+    host = DictObject(obj={"id": "192.168.1.1"})
+    module = DictObject(obj={"id": "iam"})
 
     os = ObjectSet()
     os.add_object("host", host)

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 from tastypie.exceptions import ImmediateHttpResponse
 
 from iam import Request

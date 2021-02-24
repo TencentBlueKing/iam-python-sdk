@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 class FancyDict(dict):
     def __getattr__(self, key):
         try:

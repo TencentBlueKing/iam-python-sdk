@@ -29,7 +29,12 @@ def test_basic_resource_api_dispatcher_register():
             return ListResult(results=[filter, page], count=100)
 
         def fetch_instance_info(self, filter, **options):
-            return ListResult(results=[filter, ], count=100)
+            return ListResult(
+                results=[
+                    filter,
+                ],
+                count=100,
+            )
 
         def list_instance_by_policy(self, filter, page, **options):
             return ListResult(results=[filter, page], count=100)
@@ -387,19 +392,13 @@ def test_basic_resource_api_dispatcher__dispatch():
     # test fetch_instance_info
     fetch_instance_info_req = MagicMock()
     fetch_instance_info_req.body = json.dumps(
-        {
-            "method": "fetch_instance_info",
-            "type": "spy",
-            "filter": {"ids": "ids", "attrs": "attrs"}
-        }
+        {"method": "fetch_instance_info", "type": "spy", "filter": {"ids": "ids", "attrs": "attrs"}}
     )
     fetch_instance_info_req.META = {"HTTP_X_REQUEST_ID": "rid", "HTTP_BLUEKING_LANGUAGE": "en"}
 
     resp = dispatcher._dispatch(fetch_instance_info_req)
 
-    provider.pre_fetch_instance_info.assert_called_once_with(
-        {"ids": "ids", "attrs": "attrs"}, language="en"
-    )
+    provider.pre_fetch_instance_info.assert_called_once_with({"ids": "ids", "attrs": "attrs"}, language="en")
     assert resp["code"] == 0
     assert resp["result"] is True
     assert resp["data"] == ["fetch_instance_info_token"]
@@ -407,7 +406,7 @@ def test_basic_resource_api_dispatcher__dispatch():
     assert "message" in resp
     assert provider.fetch_instance_info_spy == {
         "options": {"language": "en"},
-        "filter": {"ids": "ids", "attrs": "attrs"}
+        "filter": {"ids": "ids", "attrs": "attrs"},
     }
 
     # test list_instance_by_policy

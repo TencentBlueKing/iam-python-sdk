@@ -74,7 +74,7 @@ class BaseActionTest(unittest.TestCase):
     for abstractmethod, make sure no absent
     """
 
-    @patch.object(BaseAction, '__abstractmethods__', set())
+    @patch.object(BaseAction, "__abstractmethods__", set())
     def test(self):
         self.instance = BaseAction("edit")
 

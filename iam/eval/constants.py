@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 class OP(object):
     """
     NOTE: don't want to use Enum

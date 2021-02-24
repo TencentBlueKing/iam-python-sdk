@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
+
 try:
     from unittest.mock import patch
 except ImportError:
@@ -14,7 +15,8 @@ class BaseObjectTest(unittest.TestCase):
     """
     for abstractmethod, make sure no absent
     """
-    @patch.object(BaseObject, '__abstractmethods__', set())
+
+    @patch.object(BaseObject, "__abstractmethods__", set())
     def test(self):
         self.instance = BaseObject()
 

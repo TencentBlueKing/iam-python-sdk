@@ -15,5 +15,5 @@ class IAMAuthFailedResponse(JsonResponse):
             "data": None,
             "permission": exc.perms_apply_data(),
         }
-        kwargs['status'] = kwargs.get("status", 499)
+        kwargs["status"] = kwargs.get("status", 499)
         super(IAMAuthFailedResponse, self).__init__(*args, **kwargs)

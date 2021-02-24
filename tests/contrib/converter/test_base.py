@@ -14,7 +14,8 @@ class BaseConverterTest(unittest.TestCase):
     """
     for abstractmethod, make sure no absent
     """
-    @patch.object(Converter, '__abstractmethods__', set())
+
+    @patch.object(Converter, "__abstractmethods__", set())
     def test(self):
         self.instance = Converter()
 

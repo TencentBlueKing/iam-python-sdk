@@ -149,7 +149,7 @@ def test_and():
             "op": "eq",
             "field": "name",
             "value": "test",
-        }
+        },
     ]
     assert c._and(content) == "(id == '1' AND name == 'test')"
 
@@ -167,7 +167,7 @@ def test_or():
             "op": "eq",
             "field": "name",
             "value": "test",
-        }
+        },
     ]
     assert c._or(content) == "(id == '1' OR name == 'test')"
 
@@ -187,8 +187,8 @@ def test_convert():
                 "op": "eq",
                 "field": "name",
                 "value": "test",
-            }
-        ]
+            },
+        ],
     }
     assert c.convert(data) == "(id == '1' AND name == 'test')"
 
@@ -204,7 +204,7 @@ def test_convert():
                 "op": "eq",
                 "field": "name",
                 "value": "test",
-            }
-        ]
+            },
+        ],
     }
     assert c.convert(data) == "(id == '1' OR name == 'test')"
