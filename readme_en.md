@@ -1,23 +1,21 @@
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/TencentBlueKing/iam-python-sdk/blob/master/LICENSE.txt) [![Release Version](https://img.shields.io/badge/release-1.1.9-brightgreen.svg)](https://github.com/TencentBlueKing/iam-python-sdk/releases) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TencentBlueKing/iam-python-sdk/pulls)
 
-[(English Documents Available)](readme_en.md)
-
 ## Overview
 
 iam-python-sdk is the SDK of blueking IAM(BK-IAM), your system can use BK-IAM easily via SDK.
 
 ## Features
 
-- [Basic] 兼容Python2/Python3
-- [Basic] 完备的单元测试
-- [Basic] 支持debug调试完整流程
-- [IAM] 支持条件表达式求值: 策略查询/鉴权/获取有权限的用户列表
-- [IAM] 支持条件表达式解析: 转换成Django QuerySet及SQL语句
-- [IAM] 获取无权限申请跳转URL
-- [IAM] 支持批量资源鉴权 / 支持批量资源批量action是否有权限判断
-- [Contrib] Django IAM Migration, 整合iam模型migration到Django Migration
-- [Contrib] Resource API Framework, 协助构建需要提供给IAM调用的Resource API
-- [Contrib] 支持tastypie
+- [Basic] support both Python2/Python3
+- [Basic] unittest
+- [Basic] debug mode for all apis
+- [IAM] support expression evaluate: policy query/auth
+- [IAM] support expression analysis: transfer to Django QuerySet or SQL
+- [IAM] generate application URL
+- [IAM] batch resources auth / batch resources and batch actions auth
+- [Contrib] Django IAM Migration, merge iam model migration into Django Migration
+- [Contrib] Resource API Framework, help to implements IAM callback API easily
+- [Contrib] support tastypie
 
 ## Getting started
 

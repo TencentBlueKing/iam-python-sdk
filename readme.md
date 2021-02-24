@@ -11,7 +11,7 @@ iam-python-sdk 是蓝鲸权限中心(BK-IAM)提供的用于快速接入权限体
 - [Basic] 兼容Python2/Python3
 - [Basic] 完备的单元测试
 - [Basic] 支持debug调试完整流程
-- [IAM] 支持条件表达式求值: 策略查询/鉴权/获取有权限的用户列表
+- [IAM] 支持条件表达式求值: 策略查询/鉴权
 - [IAM] 支持条件表达式解析: 转换成Django QuerySet及SQL语句
 - [IAM] 获取无权限申请跳转URL
 - [IAM] 支持批量资源鉴权 / 支持批量资源批量action是否有权限判断
