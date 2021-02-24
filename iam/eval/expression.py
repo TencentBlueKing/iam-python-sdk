@@ -2,8 +2,8 @@
 
 import six
 
-from .constants import OP, KEYWORD_BK_IAM_PATH_FIELD_SUFFIX
-from .operators import AndOperator, OrOperator, BINARY_OPERATORS
+from .constants import KEYWORD_BK_IAM_PATH_FIELD_SUFFIX, OP
+from .operators import BINARY_OPERATORS, AndOperator, OrOperator
 
 
 def _parse_bk_iam_path(value):

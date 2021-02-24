@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-import six
 import abc
 import logging
+
+import six
 
 from iam import Action, MultiActionRequest
 

@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 
 
-import time
-import logging
 import base64
+import logging
 import sys
+import time
 from copy import deepcopy
+
+from cachetools import TTLCache, cached
 from six import string_types
 
-from cachetools import cached, TTLCache
-
 from .api.client import Client
+from .apply.models import Application
+from .auth.models import ApiAuthRequest, ApiBatchAuthRequest, MultiActionRequest, Request, Resource
+from .cache import hash_key
+from .contrib.converter.queryset import DjangoQuerySetConverter
 from .eval.expression import make_expression
 from .eval.object import ObjectSet
-from .contrib.converter.queryset import DjangoQuerySetConverter
-from .auth.models import Request, MultiActionRequest, Resource, ApiAuthRequest, ApiBatchAuthRequest
-from .exceptions import AuthAPIError, AuthInvalidRequest, AuthInvalidParam
-from .apply.models import Application
-from .cache import hash_key
+from .exceptions import AuthAPIError, AuthInvalidParam, AuthInvalidRequest
 
 logger = logging.getLogger("iam")
 

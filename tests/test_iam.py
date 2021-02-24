@@ -8,13 +8,12 @@ except ImportError:
 
 import pytest
 
-from iam.iam import IAM
-from iam.eval.object import ObjectSet
-from iam.eval.expression import make_expression
-from iam.auth.models import (Request, MultiActionRequest,
-                             Subject, Action, Resource)
-from iam.exceptions import AuthInvalidRequest, AuthInvalidParam
+from iam.auth.models import Action, MultiActionRequest, Request, Resource, Subject
 from iam.contrib.converter.sql import SQLConverter
+from iam.eval.expression import make_expression
+from iam.eval.object import ObjectSet
+from iam.exceptions import AuthInvalidParam, AuthInvalidRequest
+from iam.iam import IAM
 
 
 def new_mock_iam():

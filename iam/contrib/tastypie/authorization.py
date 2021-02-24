@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 
-import six
 import abc
 import logging
 
+import six
 from tastypie.authorization import Authorization, ReadOnlyAuthorization, Unauthorized
 from tastypie.exceptions import ImmediateHttpResponse
 
-from iam import Request, Action
-from iam.exceptions import AuthFailedException
+from iam import Action, Request
 from iam.contrib.django.response import IAMAuthFailedResponse
+from iam.exceptions import AuthFailedException
 
 logger = logging.getLogger("iam")
 

@@ -2,13 +2,13 @@
 # import unittest
 
 try:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
 except ImportError:
-    from mock import patch, MagicMock
+    from mock import MagicMock, patch
 
 # import pytest
 
-from iam import utils, Subject, Action, Resource
+from iam import Action, Resource, Subject, utils
 
 
 def test_gen_perms_apply_data():

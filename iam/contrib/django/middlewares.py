@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
-from django.utils.deprecation import MiddlewareMixin
 from django.conf import settings
-from iam.exceptions import AuthFailedBaseException
+from django.utils.deprecation import MiddlewareMixin
+
 from iam.contrib.django.response import IAMAuthFailedResponse
+from iam.exceptions import AuthFailedBaseException
 
 
 class AuthFailedExceptionMiddleware(MiddlewareMixin):

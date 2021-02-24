@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 # import pytest
 # import unittest
+from iam.contrib.tastypie.shortcuts import allow_or_raise_immediate_response_for_resources_list
+from iam.exceptions import MultiAuthFailedException
 
 try:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
 except ImportError:
     from mock import patch, MagicMock
 
 import sys
 
 sys.modules["tastypie.exceptions"] = MagicMock()
-
-from iam.contrib.tastypie.shortcuts import allow_or_raise_immediate_response_for_resources_list
-from iam.exceptions import MultiAuthFailedException
 
 
 class Resource:

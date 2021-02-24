@@ -2,15 +2,16 @@
 
 
 from __future__ import unicode_literals
-import time
+
 import json
 import logging
 import os
+import time
 
-from cachetools import cached, TTLCache
+from cachetools import TTLCache, cached
 from requests.models import PreparedRequest
 
-from .http import http_get, http_post, http_put, http_delete
+from .http import http_delete, http_get, http_post, http_put
 
 logger = logging.getLogger("iam")
 

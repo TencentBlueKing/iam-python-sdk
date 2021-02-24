@@ -3,12 +3,12 @@
 # import unittest
 
 try:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
 except ImportError:
     from mock import patch, MagicMock
 
-from iam.shortcuts import allow_or_raise_auth_failed
 from iam.exceptions import AuthFailedException
+from iam.shortcuts import allow_or_raise_auth_failed
 
 
 def test_allow_or_raise_auth_failed__allowed():

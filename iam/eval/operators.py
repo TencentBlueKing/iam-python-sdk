@@ -2,6 +2,7 @@
 
 
 import abc
+
 import six
 
 from .constants import OP

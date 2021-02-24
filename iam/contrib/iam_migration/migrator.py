@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
+import codecs
+import json
 import os
 import sys
-import json
-import codecs
 
 from django.conf import settings
 
-from iam.contrib.iam_migration.utils import do_migrate
 from iam.contrib.iam_migration import exceptions
+from iam.contrib.iam_migration.utils import do_migrate
 
 
 def upsert_system_render(data):

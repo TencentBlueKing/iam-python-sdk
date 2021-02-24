@@ -3,8 +3,8 @@
 
 import logging
 
-import requests
 import curlify
+import requests
 
 logger = logging.getLogger("iam")
 

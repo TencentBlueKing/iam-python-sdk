@@ -2,8 +2,8 @@
 
 
 import abc
-import six
 
+import six
 
 """
 build the application

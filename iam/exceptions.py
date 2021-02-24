@@ -2,6 +2,7 @@
 
 
 import abc
+
 import six
 
 from .utils import gen_perms_apply_data

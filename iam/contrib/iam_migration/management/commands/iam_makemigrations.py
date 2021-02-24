@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
 
+import codecs
 import os
 import sys
-import codecs
-
 from datetime import datetime
 
 from django.apps import apps
 from django.conf import settings
-from django.template.engine import Engine, Context
 from django.core.management.base import BaseCommand
 from django.db.migrations.loader import MigrationLoader
+from django.template.engine import Context, Engine
 
 from iam.contrib.iam_migration import conf
 from iam.contrib.iam_migration.apps import IAMMigrationConfig

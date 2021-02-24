@@ -14,12 +14,10 @@ DONE:
 """
 from __future__ import print_function
 
-from iam import DictObject, ObjectSet, make_expression
-from iam import Subject, Action, Resource, Request
-from iam import IAM
-
-import sys
 import logging
+import sys
+
+from iam import IAM, Action, DictObject, ObjectSet, Request, Resource, Subject, make_expression
 
 iam_logger = logging.getLogger("iam")
 iam_logger.setLevel(logging.DEBUG)

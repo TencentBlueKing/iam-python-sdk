@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import six
 import abc
+
+import six
 
 
 class ListResult(object):

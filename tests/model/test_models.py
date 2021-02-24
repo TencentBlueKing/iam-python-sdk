@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from iam.model.models import (
-    SystemProviderConfig,
-    System,
-    ReferenceResourceType,
-    ResourceProviderConfig,
-    ResourceType,
-    InstanceSelection,
-    RelatedResourceType,
     Action,
     ActionTopology,
+    InstanceSelection,
+    ReferenceResourceType,
+    RelatedResourceType,
+    ResourceProviderConfig,
+    ResourceType,
+    System,
+    SystemProviderConfig,
 )
 
 

@@ -10,13 +10,13 @@ except ImportError:
 import pytest
 
 from iam.apply.models import (
-    ResourceNode,
-    ResourceInstance,
-    RelatedResourceType,
-    BaseAction,
     ActionWithoutResources,
     ActionWithResources,
     Application,
+    BaseAction,
+    RelatedResourceType,
+    ResourceInstance,
+    ResourceNode,
 )
 
 

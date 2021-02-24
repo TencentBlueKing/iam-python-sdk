@@ -5,12 +5,11 @@ import pytest
 # import unittest
 
 try:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
 except ImportError:
     from mock import patch, MagicMock
 
-
-from iam.exceptions import AuthBaseException, AuthAPIError, AuthInvalidRequest, AuthInvalidParam, AuthFailedException
+from iam.exceptions import AuthAPIError, AuthBaseException, AuthFailedException, AuthInvalidParam, AuthInvalidRequest
 
 
 def test_exceptions():

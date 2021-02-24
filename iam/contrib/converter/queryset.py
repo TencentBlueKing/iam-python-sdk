@@ -2,13 +2,14 @@
 
 
 import operator
-from six.moves import reduce
 
 from django.db.models import Q
+from six.moves import reduce
 
 from iam import OP
-from iam.eval.expression import field_value_convert
 from iam.eval.constants import KEYWORD_BK_IAM_PATH_FIELD_SUFFIX
+from iam.eval.expression import field_value_convert
+
 from .base import Converter
 
 """

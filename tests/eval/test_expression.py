@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from iam.eval.constants import OP, KEYWORD_BK_IAM_PATH_FIELD_SUFFIX
-from iam import make_expression, ObjectSet
+from iam import ObjectSet, make_expression
+from iam.eval.constants import KEYWORD_BK_IAM_PATH_FIELD_SUFFIX, OP
 from iam.eval.expression import _parse_bk_iam_path, field_value_convert
 
 

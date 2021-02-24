@@ -5,8 +5,8 @@ import six
 
 from iam import OP
 from iam.eval.expression import field_value_convert
-from .base import Converter
 
+from .base import Converter
 
 """
 convert the expression into sql where clause

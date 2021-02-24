@@ -8,7 +8,7 @@ except ImportError:
 
 import pytest
 
-from iam.auth.models import BaseObject, Subject, Action, Resource, Request, MultiActionRequest
+from iam.auth.models import Action, BaseObject, MultiActionRequest, Request, Resource, Subject
 
 
 class BaseObjectTest(unittest.TestCase):

@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import json
+
 import pytest
 
 from iam.contrib.django.dispatcher.exceptions import KeywordTooShortException
 
 try:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
 except ImportError:
     from mock import patch, MagicMock
 
-from iam.exceptions import AuthInvalidOperation
-from iam.resource.provider import ResourceProvider, ListResult
 from iam.contrib.django.dispatcher import DjangoBasicResourceApiDispatcher, InvalidPageException
+from iam.exceptions import AuthInvalidOperation
+from iam.resource.provider import ListResult, ResourceProvider
 
 
 def test_basic_resource_api_dispatcher_register():

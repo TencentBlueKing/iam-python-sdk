@@ -11,12 +11,11 @@ import logging
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from iam.contrib.django.dispatcher.exceptions import InvalidPageException, KeywordTooShortException
+from iam.exceptions import AuthInvalidOperation
 from iam.resource.dispatcher import ResourceApiDispatcher
 from iam.resource.provider import ResourceProvider
-from iam.resource.utils import get_page_obj, get_filter_obj
-from iam.exceptions import AuthInvalidOperation
-
-from iam.contrib.django.dispatcher.exceptions import InvalidPageException, KeywordTooShortException
+from iam.resource.utils import get_filter_obj, get_page_obj
 
 logger = logging.getLogger("iam")
 

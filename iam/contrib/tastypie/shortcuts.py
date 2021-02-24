@@ -4,8 +4,8 @@
 from tastypie.exceptions import ImmediateHttpResponse
 
 from iam import Request
-from iam.exceptions import AuthFailedException, MultiAuthFailedException
 from iam.contrib.django.response import IAMAuthFailedResponse
+from iam.exceptions import AuthFailedException, MultiAuthFailedException
 
 
 def allow_or_raise_immediate_response(iam, system, subject, action, resources, environment=None):

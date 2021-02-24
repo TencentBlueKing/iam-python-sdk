@@ -1,4 +1,5 @@
 import os
+
 import setuptools
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -19,7 +20,7 @@ with open(os.path.join(here, "iam", "__version__.py"), "r") as f:
 setuptools.setup(
     name="bk-iam",
     version=about["__version__"],
-    author="TencentBlueking",
+    author="TencentBlueKing",
     author_email="contactus_bk@tencent.com",
     description="bk-iam python sdk",
     long_description=long_description,
