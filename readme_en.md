@@ -30,7 +30,7 @@ $ pip install bk-iam
 
 ### Usage
 
-- [usage doc](usage.md)
+- [usage doc](docs/usage.md)
 
 ## Roadmap
 
