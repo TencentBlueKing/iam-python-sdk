@@ -1,1 +1,8 @@
 recursive-include iam/contrib/iam_migration/templates *.tmpl
+recursive-exclude tests *.py
+include LICENSE.txt
+include MANIFEST.in
+include readme.md
+include readme_en.md
+global-exclude __pycache__
+global-exclude *.py[co]
