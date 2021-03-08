@@ -57,8 +57,6 @@ $ pip install bk-iam
 
 如果你有好的意见或建议，欢迎给我们提 Issues 或 Pull Requests，为蓝鲸开源社区贡献力量。
 
-[腾讯开源激励计划](https://opensource.tencent.com/contribution) 鼓励开发者的参与和贡献，期待你的加入。
-
 ## License
 
 基于 MIT 协议， 详细请参考[LICENSE](LICENSE.txt)

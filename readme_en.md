@@ -55,9 +55,6 @@ $ pip install bk-iam
 
 If you have good ideas or suggestions, please let us know by Issues or Pull Requests and contribute to the Blue Whale Open Source Community.
 
-If you are interested in contributing, check out the [CONTRIBUTING.md], also join our [Tencent OpenSource Plan](https://opensource.tencent.com/contribution).
-
-
 ## License
 
 Based on the MIT protocol. Please refer to [LICENSE](LICENSE.txt)
