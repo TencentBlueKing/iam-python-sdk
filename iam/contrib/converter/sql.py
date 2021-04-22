@@ -44,7 +44,7 @@ class SQLConverter(Converter):
         """
         if right is an array, [1, 2, 3]
         should be
-        (left == 1 OR left == 2 OR left == 3)
+        (left = 1 OR left = 2 OR left = 3)
         (left LIKE '1%' OR left LIKE '2%' OR left LIKE '3%')
         """
         is_array = isinstance(right, (list, tuple))
@@ -69,7 +69,7 @@ class SQLConverter(Converter):
         return fmt.format(left, self._to_str_present(right, wrap_str))
 
     def _eq(self, left, right):
-        return self._positive("{} == {}", left, right)
+        return self._positive("{} = {}", left, right)
 
     def _not_eq(self, left, right):
         return self._negative("{} != {}", left, right)
@@ -116,7 +116,7 @@ class SQLConverter(Converter):
         return self._positive("{} >= {}", left, right)
 
     def _any(self, left, right):
-        return "1 == 1"
+        return "1 = 1"
 
     def _and(self, content):
         condition = " AND ".join([self.convert(c) for c in content])

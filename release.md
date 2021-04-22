@@ -1,5 +1,8 @@
 版本日志
 ===============
+# v1.1.10
+
+- bugfix: sql converter equals syntax error
 
 # v1.1.9
 
