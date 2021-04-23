@@ -25,10 +25,10 @@ def test_to_str_present():
 def test_eq():
     c = SQLConverter()
 
-    assert c._eq("id", "1") == "id == '1'"
-    assert c._eq("id", 1) == "id == 1"
+    assert c._eq("id", "1") == "id = '1'"
+    assert c._eq("id", 1) == "id = 1"
 
-    assert c._eq("id", ["1", 1]) == "(id == '1' OR id == 1)"
+    assert c._eq("id", ["1", 1]) == "(id = '1' OR id = 1)"
 
 
 def test_not_eq():
@@ -143,7 +143,7 @@ def test_gte():
 def test_any():
     c = SQLConverter()
 
-    assert c._any(1, 1) == "1 == 1"
+    assert c._any(1, 1) == "1 = 1"
 
 
 def test_and():
@@ -161,7 +161,7 @@ def test_and():
             "value": "test",
         },
     ]
-    assert c._and(content) == "(id == '1' AND name == 'test')"
+    assert c._and(content) == "(id = '1' AND name = 'test')"
 
 
 def test_or():
@@ -179,7 +179,7 @@ def test_or():
             "value": "test",
         },
     ]
-    assert c._or(content) == "(id == '1' OR name == 'test')"
+    assert c._or(content) == "(id = '1' OR name = 'test')"
 
 
 def test_convert():
@@ -200,7 +200,7 @@ def test_convert():
             },
         ],
     }
-    assert c.convert(data) == "(id == '1' AND name == 'test')"
+    assert c.convert(data) == "(id = '1' AND name = 'test')"
 
     data = {
         "op": "OR",
@@ -217,4 +217,4 @@ def test_convert():
             },
         ],
     }
-    assert c.convert(data) == "(id == '1' OR name == 'test')"
+    assert c.convert(data) == "(id = '1' OR name = 'test')"
