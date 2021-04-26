@@ -61,18 +61,18 @@ class Client(object):
             preReq.prepare_url(url, self._extra_url_params)
             url = preReq.url
 
-        ok, _data = http_func(url, data, headers=headers, timeout=timeout)
+        ok, message, _data = http_func(url, data, headers=headers, timeout=timeout)
 
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("do http request: method=`%s`, url=`%s`, data=`%s`", http_func.__name__, url, json.dumps(data))
-            logger.debug("http request result: ok=`%s`, _data=`%s`", ok, json.dumps(_data))
+            logger.debug("http request result: ok=`%s`, message=`%s`, _data=`%s`", ok, message, json.dumps(_data))
             logger.debug("http request took %s ms", int((time.time() - begin) * 1000))
 
         if not ok:
-            return False, "verify from iam server fail", None
+            return False, message or "verify from iam server fail", None
 
         if _data.get("code") != 0:
-            return False, _data.get("message", "iam api fail"), None
+            return False, _data.get("message") or "iam api fail", None
 
         _d = _data.get("data")
 
@@ -219,7 +219,7 @@ class Client(object):
     # ---------- ping
     def ping(self):
         url = "{host}{path}".format(host=self._host, path="/ping")
-        ok, data = http_get(url, None, timeout=5)
+        ok, _, data = http_get(url, None, timeout=5)
         return ok, data
 
     # ---------- query system_id_set/resource_type_id_set, action_id_set

@@ -22,18 +22,18 @@ from iam.api.client import Client
 
 def _test_ok_message_data(mock_request, call_func):
     # 1. request fail
-    mock_request.return_value = (False, {})
+    mock_request.return_value = (False, "error", {})
     ok, message, data = call_func({})
 
     assert not ok
 
     # 2. request success, code not 0
-    mock_request.return_value = (True, {"code": 404, "message": "not found"})
+    mock_request.return_value = (True, "error status_code != 200", {"code": 404, "message": "not found"})
     ok, message, data = call_func({})
     assert not ok
 
     # 3. request success, code 0
-    mock_request.return_value = (True, {"code": 0, "message": "ok", "data": {1: 1}})
+    mock_request.return_value = (True, "ok", {"code": 0, "message": "ok", "data": {1: 1}})
     ok, message, data = call_func({})
     assert ok
     assert message == "ok"
@@ -52,18 +52,18 @@ def test_client_policy_query(mock_post):
 
 def _test_ok_message(mock_request, call_func, kwargs):
     # 1. request fail
-    mock_request.return_value = (False, {})
+    mock_request.return_value = (False, "error", {})
     ok, message = call_func(**kwargs)
 
     assert not ok
 
     # 2. request success, code not 0
-    mock_request.return_value = (True, {"code": 404, "message": "not found"})
+    mock_request.return_value = (True, "error status_code != 200", {"code": 404, "message": "not found"})
     ok, message = call_func(**kwargs)
     assert not ok
 
     # 3. request success, code 0
-    mock_request.return_value = (True, {"code": 0, "message": "ok", "data": {1: 1}})
+    mock_request.return_value = (True, "ok", {"code": 0, "message": "ok", "data": {1: 1}})
     ok, message = call_func(**kwargs)
     assert ok
     assert message == "ok"
