@@ -1,5 +1,9 @@
 版本日志
 ===============
+# v1.1.11
+
+- add: raise http fail with detail
+
 # v1.1.10
 
 - bugfix: sql converter equals syntax error

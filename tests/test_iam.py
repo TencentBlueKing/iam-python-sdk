@@ -293,7 +293,7 @@ def test_make_filter():
         iam = new_mock_iam()
         sql = iam.make_filter(r, SQLConverter, {})
 
-        assert sql == "1 == 1"
+        assert sql == "1 = 1"
 
     data = {
         "op": "OR",
@@ -314,7 +314,7 @@ def test_make_filter():
         iam = new_mock_iam()
         sql = iam.make_filter(r, SQLConverter, {"host.label": "tag"})
 
-        assert sql == "(host.id == 'hello' OR (tag != 'db' AND tag != 'redis'))"
+        assert sql == "(host.id = 'hello' OR (tag != 'db' AND tag != 'redis'))"
 
 
 def test_query_subjects():

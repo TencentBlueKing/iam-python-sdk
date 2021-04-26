@@ -88,10 +88,11 @@ def _http_request(
                 cookies=cookies,
             )
         else:
-            return False, None
-    except requests.exceptions.RequestException:
-        logger.exception("http error! request: [method=`%s`, url=`%s`, data=`%s`]", method, url, data)
-        return False, None
+            return False, "invalid http method: %s" % method, None
+    except requests.exceptions.RequestException as e:
+        message = "http error! request: [method=`%s`, url=`%s`, data=`%s`] err=`%s`" % (method, url, data, str(e))
+        logger.exception(message)
+        return False, message, None
     else:
         request_id = resp.headers.get("X-Request-Id")
 
@@ -104,11 +105,12 @@ def _http_request(
         )
 
         if resp.status_code != 200:
-            logger.error(message_format % (method, url, str(data), resp.status_code, request_id, content))
-            return False, None
+            message = message_format % (method, url, str(data), resp.status_code, request_id, content)
+            logger.error(message)
+            return False, message, None
 
         logger.info(message_format % (method, url, str(data), resp.status_code, request_id, content))
-        return True, resp.json()
+        return True, "ok", resp.json()
     finally:
         if resp.request is None:
             resp.request = requests.Request(method, url, headers=headers, data=data, cookies=cookies).prepare()
