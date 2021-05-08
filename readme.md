@@ -1,7 +1,7 @@
 ![](docs/resource/img/bk_iam_zh.png)
 ---
 
-[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/TencentBlueKing/iam-python-sdk/blob/master/LICENSE.txt) [![Release Version](https://img.shields.io/badge/release-1.1.9-brightgreen.svg)](https://github.com/TencentBlueKing/iam-python-sdk/releases) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TencentBlueKing/iam-python-sdk/pulls)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/TencentBlueKing/iam-python-sdk/blob/master/LICENSE.txt) [![Release Version](https://img.shields.io/badge/release-1.1.9-brightgreen.svg)](https://github.com/TencentBlueKing/iam-python-sdk/releases) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TencentBlueKing/iam-python-sdk/pulls) [![BK Pipelines Status](https://api.bkdevops.qq.com/process/api/external/pipelines/projects/iam/p-5c359e750bb9457984ab84656651d843/badge?X-DEVOPS-PROJECT-ID=iam)](http://devops.oa.com/process/api-html/user/builds/projects/iam/pipelines/p-5c359e750bb9457984ab84656651d843/latestFinished?X-DEVOPS-PROJECT-ID=iam)
 
 [(English Documents Available)](readme_en.md)
 
