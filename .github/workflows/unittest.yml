@@ -26,4 +26,4 @@ jobs:
         pip install -r requirements_test.txt
     - name: Test
       run: |
-        pytest test/*
+        pytest tests/*
