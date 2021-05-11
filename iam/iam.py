@@ -32,6 +32,8 @@ from .exceptions import AuthAPIError, AuthInvalidParam, AuthInvalidRequest
 logger = logging.getLogger("iam")
 
 
+# actions test
+
 class IAM(object):
     """
     input: object
