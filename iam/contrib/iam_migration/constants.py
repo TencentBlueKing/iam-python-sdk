@@ -11,4 +11,4 @@ specific language governing permissions and limitations under the License.
 """
 
 
-APP_NAME = "iam_migration"
+APP_NAME = "iam.contrib.iam_migration"
