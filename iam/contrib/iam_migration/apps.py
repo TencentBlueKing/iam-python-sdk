@@ -13,8 +13,9 @@ specific language governing permissions and limitations under the License.
 
 from django.apps import AppConfig
 
-from iam.contrib.iam_migration.constants import APP_NAME
+from iam.contrib.iam_migration.constants import APP_NAME, APP_VERBOSE_NAME
 
 
 class IAMMigrationConfig(AppConfig):
     name = APP_NAME
+    verbose_name = APP_VERBOSE_NAME
