@@ -1,0 +1,91 @@
+{
+    "system_id": "demo",
+    "operations": [
+        {
+            "operation": "upsert_system",
+            "data":{
+                "id": "demo",
+                "name": "Demo平台",
+                "name_en": "Demo",
+                "description": "A demo SaaS for quick start",
+                "description_en": "A demo SaaS for quick start.",
+                "clients": "demo",
+                "provider_config": {
+                    "host": "http://127.0.0.1:5000",
+                    "auth": "basic",
+                    "healthz": "/healthz/"
+                }
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data":{
+                "id": "access_developer_center",
+                "name": "访问开发者中心",
+                "name_en": "access developer center",
+                "description": "一个用户是否能访问开发者中心",
+                "description_en": "Is allowed to access the developer center",
+                "type": "create",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data":{
+                "id": "app",
+                "name": "SaaS应用",
+                "name_en": "application",
+                "description": "SaaS应用",
+                "description_en": "SaaS application",
+                "provider_config": {
+                    "path": "/api/v1/iam/apps"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data":{
+                "id": "app_view",
+                "name": "应用视图",
+                "name_en": "app_view",
+                "resource_type_chain": [
+                    {
+                        "system_id": "demo",
+                        "id": "app"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data":{
+                "id": "develop_app",
+                "name": "开发SaaS应用",
+                "name_en": "develop app",
+                "description": "一个用户是否能够开发SaaS",
+                "description_en": "Is allowed to develop SaaS app",
+                "type": "",
+                "related_actions": [
+                    "access_developer_center"
+                ],
+                "related_resource_types": [
+                    {
+                        "system_id": "demo",
+                        "id": "app",
+                        "name_alias": "",
+                        "name_alias_en": "",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "demo",
+                                "id": "app_view"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        }
+    ]
+}

@@ -1,5 +1,11 @@
 版本日志
 ===============
+# v1.1.12
+
+- bugfix: app_name error for django 3.2, improve verbose_name
+- fix lint
+- add: iam migration example.json
+
 # v1.1.11
 
 - add: raise http fail with detail

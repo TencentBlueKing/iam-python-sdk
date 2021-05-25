@@ -19,6 +19,9 @@ import os
 
 import requests
 
+
+# NOTE: the usage doc https://bk.tencent.com/docs/document/6.0/160/8388
+
 __version__ = "1.0.0"
 
 BK_IAM_HOST = os.getenv("BK_IAM_V3_INNER_HOST", "http://bkiam.service.consul:5001")
