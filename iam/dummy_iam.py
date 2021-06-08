@@ -32,6 +32,9 @@ class DummyIAM(object):
     def _do_policy_query(self, request, with_resources=True):
         return []
 
+    def _do_policy_query_with_cache(self, request):
+        return self._do_policy_query(request)
+
     def _do_policy_query_by_actions(self, request, with_resources=True):
         return []
 
@@ -117,6 +120,9 @@ class DummyIAM(object):
                 "resources_list should all with the same resource_type, but got %s" % resource_types.keys()
             )
 
+    def is_allowed_with_cache(self, request):
+        return self.is_allowed(request)
+
     def is_allowed(self, request):
         """
         单个资源是否有权限校验
@@ -175,7 +181,7 @@ class DummyIAM(object):
         for resources in resources_list:
             for a in request.to_dict()["actions"]:
                 action = a["id"]
-                obj_set, resource_id = self._build_object_set(request.system, resources, only_local=False)
+                _, resource_id = self._build_object_set(request.system, resources, only_local=False)
                 resources_actions_perms.setdefault(resource_id, {})[action] = True
         return resources_actions_perms
 
