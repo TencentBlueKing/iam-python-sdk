@@ -29,12 +29,15 @@ def test_allow_or_raise_auth_failed__allowed():
 
     iam = MagicMock()
     iam.is_allowed = MagicMock(return_value=True)
+    iam.is_allowed_with_cache = MagicMock()
 
     Request = MagicMock()
 
     with patch("iam.shortcuts.Request", Request):
         allow_or_raise_auth_failed(iam, system, subject, action, resources)
 
+    iam.is_allowed.assert_called()
+    iam.is_allowed_with_cache.assert_not_called()
     Request.assert_called_once_with(system, subject, action, resources, None)
 
 
@@ -46,6 +49,7 @@ def test_allow_or_raise_auth_failed__raise():
 
     iam = MagicMock()
     iam.is_allowed = MagicMock(return_value=False)
+    iam.is_allowed_with_cache = MagicMock()
 
     Request = MagicMock()
 
@@ -60,4 +64,24 @@ def test_allow_or_raise_auth_failed__raise():
         else:
             assert False, "allow_or_raise_auth_failed did not raise"
 
+    iam.is_allowed.assert_called()
+    iam.is_allowed_with_cache.assert_not_called()
     Request.assert_called_once_with(system, subject, action, resources, None)
+
+
+def test_allow_or_raise_auth_failed__use_cache():
+    system = "system"
+    subject = "subject"
+    action = "action"
+    resources = ["r1", "r2"]
+
+    iam = MagicMock()
+    iam.is_allowed_with_cache = MagicMock(return_value=True)
+
+    Request = MagicMock(return_value="request")
+
+    with patch("iam.shortcuts.Request", Request):
+        allow_or_raise_auth_failed(iam, system, subject, action, resources, cache=True)
+
+    Request.assert_called_once_with(system, subject, action, resources, None)
+    iam.is_allowed_with_cache.assert_called_once_with("request")

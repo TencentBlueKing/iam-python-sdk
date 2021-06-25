@@ -1,5 +1,9 @@
 版本日志
 ===============
+
+# v1.1.14
+
+- add: iam.shortcuts.allow_or_raise_auth_failed 支持使用 cache 判断
 # v1.1.13
 
 - add: iam_migration 如果配置了BK_IAM_SKIP，则不进行migrate
