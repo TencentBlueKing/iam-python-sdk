@@ -1,5 +1,16 @@
 版本日志
 ===============
+# v1.1.13
+
+- add: iam_migration 如果配置了BK_IAM_SKIP，则不进行migrate
+- add: dummy iam 新增_do_policy_query_with_cache和is_allowed_with_cache实现
+
+# v1.1.12
+
+- bugfix: app_name error for django 3.2, improve verbose_name
+- fix lint
+- add: iam migration example.json
+
 # v1.1.11
 
 - add: raise http fail with detail
