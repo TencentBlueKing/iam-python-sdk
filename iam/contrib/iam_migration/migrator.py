@@ -44,7 +44,7 @@ class IAMMigrator(object):
         if "migrate" not in sys.argv:
             return
 
-        if getattr(settings, "BK_IAM_SKIP"):
+        if getattr(settings, "BK_IAM_SKIP", False):
             return
 
         json_path = getattr(settings, "BK_IAM_MIGRATION_JSON_PATH", "support-files/iam/")
