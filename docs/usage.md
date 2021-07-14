@@ -444,7 +444,7 @@ BK_IAM_API_PREFIX = SITE_URL + 'openapi'
 ### 2.1 Django Migration
 
 1. 将 `iam.contrib.iam_migration` 加入 `INSTALLED_APPS` 中
-2. 在项目根目录的 `support-files/iam/` 中添加 [iam migration json 文件](../iam/contrib/iam_migration/utils/do_migrate.py)
+2. 在项目根目录的 `support-files/iam/` 中添加 iam migration json 文件
 3. 执行 `python manage.py iam_makemigrations {migration_json_file_name}` （其中 `migration_json_file_name}` 为新加入的 iam migration json 文件名），该命令会在 `iam/contrib/iam_migration/migrations` 目录下生成用于执行向权限中心注册系统、资源和操作的 migration 文件，当应用第一次部署时，这些 migration 文件会随之执行。**注意：如果你的 iam sdk 不是以源码的方式嵌入项目中而是以 pip 的方式安装的，那么请额外配置 `BK_IAM_MIGRATION_APP_NAME` 来设置用于存储 migration 文件的 APP**
 
 #### 2.2 CONFIG
