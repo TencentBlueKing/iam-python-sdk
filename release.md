@@ -1,9 +1,14 @@
 版本日志
 ===============
 
+# v1.1.15
+
+- bugfix: 修复当settings没有提供BK_IAM_SKIP变量导致migrate失败的问题
+
 # v1.1.14
 
 - add: iam.shortcuts.allow_or_raise_auth_failed 支持使用 cache 判断
+
 # v1.1.13
 
 - add: iam_migration 如果配置了BK_IAM_SKIP，则不进行migrate
