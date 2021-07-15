@@ -445,10 +445,14 @@ BK_IAM_API_PREFIX = SITE_URL + 'openapi'
 
 1. 将 `iam.contrib.iam_migration` 加入 `INSTALLED_APPS` 中
 2. 在项目根目录的 `support-files/iam/` 中添加 iam migration json 文件
-3. 执行 `python manage.py iam_makemigrations {migration_json_file_name}` （其中 `migration_json_file_name}` 为新加入的 iam migration json 文件名），该命令会在 `iam/contrib/iam_migration/migrations` 目录下生成用于执行向权限中心注册系统、资源和操作的 migration 文件，当应用第一次部署时，这些 migration 文件会随之执行。**注意：如果你的 iam sdk 不是以源码的方式嵌入项目中而是以 pip 的方式安装的，那么请额外配置 `BK_IAM_MIGRATION_APP_NAME` 来设置用于存储 migration 文件的 APP**
+3. 执行 `python manage.py iam_makemigrations {migration_json_file_name}` （其中 `migration_json_file_name}` 为新加入的 iam migration json 文件名），该命令会在 `iam/contrib/iam_migration/migrations` 目录下生成用于执行向权限中心注册系统、资源和操作的 migration 文件，当应用第一次部署时，这些 migration 文件会随之执行。
+    - **注意：如果你的 iam sdk 不是以源码的方式嵌入项目中而是以 pip 的方式安装的，那么请额外配置 `BK_IAM_MIGRATION_APP_NAME` 来设置用于存储 migration 文件的 APP**
 
 #### 2.2 CONFIG
 
+- `APP_CODE/SECRET_KEY` 应用在蓝鲸开发者中心申请应用的`app_code/app_secret`
+- `BK_IAM_SYSTEM_ID` 接入系统注册到权限中心使用的系统 ID(system_id)
+- `BK_IAM_INNER_HOST` 权限中心后台的地址
 - `BK_IAM_MIGRATION_JSON_PATH`：如果你不想将 iam migration json 放置在 `support-files/iam/` 目录下，请在 Django Setting 中将该变量配置为你想要存放 iam migration json 文件的相对目录
 - `BK_IAM_RESOURCE_API_HOST`：如果你无法确定 upsert_system 操作 data 中的 `provider_config.host` 的值，那么可以在 Django Setting 中配置这个变量，IAM Migration 会在执行 upsert_system 操作前将 `provider_config.host` 设置为 `BK_IAM_RESOURCE_API_HOST`
 - `BK_IAM_MIGRATION_APP_NAME`：如果你是以 pip 的方式安装 iam sdk，那么请单独新建一个 Django app，将 `BK_IAM_MIGRATION_APP_NAME` 设置为该 app 的 label，并将该 app 加入 `INSTALLED_APPS` 中，iam migrator 会将 Django migration 文件置于该 app 的 `migrations` 目录下。
