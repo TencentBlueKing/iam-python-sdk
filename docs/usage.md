@@ -33,10 +33,10 @@ iam_logger.addHandler(debug_hanler)
 ```
 DEBUG [2020-05-21 14:23:22,833] [IAM] calling IAM.is_allowed(request)......
 DEBUG [2020-05-21 14:23:22,833] [IAM] the request: {'action': {'id': 'access_developer_center'}, 'environment': {}, 'system': 'bk_paas', 'resources': [], 'subject': {'type': 'user', 'id': u'admin'}}
-INFO [2020-05-21 14:23:22,918] [IAM] request: [method=`POST`, url=`http://9.136.139.172:8080/api/v1/policy/query`, data=`{'action': {'id': 'access_developer_center'}, 'environment': {}, 'system': 'bk_paas', 'resources': [], 'subject': {'type': 'user', 'id': u'admin'}}`]response: [status_code=`200`, request_id=`8e0c2a6f599248ecaad7579488956927`, content=`{"code":0,"message":"ok","data":{"field":"","op":"any","value":[]},"debug":{"time":"2020-05-21T14:23`]
+INFO [2020-05-21 14:23:22,918] [IAM] request: [method=`POST`, url=`http://{IAM_HOST}:8080/api/v1/policy/query`, data=`{'action': {'id': 'access_developer_center'}, 'environment': {}, 'system': 'bk_paas', 'resources': [], 'subject': {'type': 'user', 'id': u'admin'}}`]response: [status_code=`200`, request_id=`8e0c2a6f599248ecaad7579488956927`, content=`{"code":0,"message":"ok","data":{"field":"","op":"any","value":[]},"debug":{"time":"2020-05-21T14:23`]
 DEBUG [2020-05-21 14:23:22,919] [IAM] the request id: `8e0c2a6f599248ecaad7579488956927`
 DEBUG [2020-05-21 14:23:22,919] [IAM] the curl: `curl -X POST -H 'X-BK-APP-CODE: {APP_CODE}' -H 'X-BK-APP-SECRET: {APP_SECRET}' -H 'X-Bk-IAM-Version: 1' -d '{"action": {"id": "access_developer_center"}, "environment": {}, "system": "bk_paas", "resources": [], "subject": {"type": "user", "id": "admin"}}' 'http://127.0.0.1:8080/api/v1/policy/query?debug=true'`
-DEBUG [2020-05-21 14:23:22,919] [IAM] do http request: method=`http_post`, url=`http://127.0.0.1:8080/api/v1/policy/query`, data=`{"action": {"id": "access_developer_center"}, "environment": {}, "system": "bk_paas", "resources": [], "subject": {"type": "user", "id": "admin"}}`
+DEBUG [2020-05-21 14:23:22,919] [IAM] do http request: method=`http_post`, url=`http://{IAM_HOST}/api/v1/policy/query`, data=`{"action": {"id": "access_developer_center"}, "environment": {}, "system": "bk_paas", "resources": [], "subject": {"type": "user", "id": "admin"}}`
 DEBUG [2020-05-21 14:23:22,920] [IAM] http request result: ok=`True`, _data=`{"message": "ok", "code": 0, "data": {"field": "", "value": [], "op": "any"}}`
 DEBUG [2020-05-21 14:23:22,920] [IAM] http request took 86 ms
 DEBUG [2020-05-21 14:23:22,920] [IAM] the return policies: {u'field': u'', u'value': [], u'op': u'any'}
@@ -444,14 +444,19 @@ BK_IAM_API_PREFIX = SITE_URL + 'openapi'
 ### 2.1 Django Migration
 
 1. 将 `iam.contrib.iam_migration` 加入 `INSTALLED_APPS` 中
-2. 在项目根目录的 `support-files/iam/` 中添加 [iam migration json 文件](../iam/contrib/iam_migration/utils/do_migrate.py)
-3. 执行 `python manage.py iam_makemigrations {migration_json_file_name}` （其中 `migration_json_file_name}` 为新加入的 iam migration json 文件名），该命令会在 `iam/contrib/iam_migration/migrations` 目录下生成用于执行向权限中心注册系统、资源和操作的 migration 文件，当应用第一次部署时，这些 migration 文件会随之执行。**注意：如果你的 iam sdk 不是以源码的方式嵌入项目中而是以 pip 的方式安装的，那么请额外配置 `BK_IAM_MIGRATION_APP_NAME` 来设置用于存储 migration 文件的 APP**
+2. 在项目根目录的 `support-files/iam/` 中添加 iam migration json 文件
+3. 执行 `python manage.py iam_makemigrations {migration_json_file_name}` （其中 `migration_json_file_name}` 为新加入的 iam migration json 文件名），该命令会在 `iam/contrib/iam_migration/migrations` 目录下生成用于执行向权限中心注册系统、资源和操作的 migration 文件，当应用第一次部署时，这些 migration 文件会随之执行。
+    - **注意：如果你的 iam sdk 不是以源码的方式嵌入项目中而是以 pip 的方式安装的，那么请额外配置 `BK_IAM_MIGRATION_APP_NAME` 来设置用于存储 migration 文件的 APP**
 
 #### 2.2 CONFIG
 
+- `APP_CODE/SECRET_KEY` 应用在蓝鲸开发者中心申请应用的`app_code/app_secret`
+- `BK_IAM_SYSTEM_ID` 接入系统注册到权限中心使用的系统 ID(system_id)
+- `BK_IAM_INNER_HOST` 权限中心后台的地址
 - `BK_IAM_MIGRATION_JSON_PATH`：如果你不想将 iam migration json 放置在 `support-files/iam/` 目录下，请在 Django Setting 中将该变量配置为你想要存放 iam migration json 文件的相对目录
 - `BK_IAM_RESOURCE_API_HOST`：如果你无法确定 upsert_system 操作 data 中的 `provider_config.host` 的值，那么可以在 Django Setting 中配置这个变量，IAM Migration 会在执行 upsert_system 操作前将 `provider_config.host` 设置为 `BK_IAM_RESOURCE_API_HOST`
 - `BK_IAM_MIGRATION_APP_NAME`：如果你是以 pip 的方式安装 iam sdk，那么请单独新建一个 Django app，将 `BK_IAM_MIGRATION_APP_NAME` 设置为该 app 的 label，并将该 app 加入 `INSTALLED_APPS` 中，iam migrator 会将 Django migration 文件置于该 app 的 `migrations` 目录下。
+- `BK_IAM_SKIP`: 是否跳过iam migration, 某些版本sdk强依赖, 可以设置成`False`或`None`
   - >TIPS：
     > - 可以使用 `python manage.py startapp {app_name}` 命令来新建 django app
     > - 如果 app 是已存在的，请确保该 app 目录下存在 `migrations/__init__.py` 文件）
