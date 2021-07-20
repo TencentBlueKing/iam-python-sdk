@@ -43,7 +43,7 @@ def _test_ok_message_data(mock_request, call_func):
 
 @patch("iam.api.client.http_post")
 def test_client_policy_query(mock_post):
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
 
     _test_ok_message_data(mock_post, c.policy_query)
 
@@ -71,7 +71,7 @@ def _test_ok_message(mock_request, call_func, kwargs):
 
 @patch("iam.api.client.http_post")
 def test_create(mock_post):
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
 
     _test_ok_message(mock_post, c.add_system, dict(data={}))
 
@@ -84,7 +84,7 @@ def test_create(mock_post):
 
 @patch("iam.api.client.http_put")
 def test_update(mock_put):
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
 
     _test_ok_message(mock_put, c.update_system, dict(system_id="", data={}))
 
@@ -97,7 +97,7 @@ def test_update(mock_put):
 
 @patch("iam.api.client.http_delete")
 def test_delete(mock_delete):
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
 
     _test_ok_message(mock_delete, c.batch_delete_resource_types, dict(system_id="", data={}))
 
@@ -106,13 +106,13 @@ def test_delete(mock_delete):
 
 @patch.dict(os.environ, {"ABC": "true"})
 def test_client_extra_url_params_empty():
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
     assert not c._extra_url_params
 
 
 @patch.dict(os.environ, {"IAM_API_DEBUG": "true"})
 def test_client_extra_url_params_debug_1():
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
     assert c._extra_url_params
     assert len(c._extra_url_params) == 1
     assert c._extra_url_params.get("debug") == "true"
@@ -120,7 +120,7 @@ def test_client_extra_url_params_debug_1():
 
 @patch.dict(os.environ, {"BKAPP_IAM_API_DEBUG": "true"})
 def test_client_extra_url_params_debug_2():
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
     assert c._extra_url_params
     assert len(c._extra_url_params) == 1
     assert c._extra_url_params.get("debug") == "true"
@@ -128,7 +128,7 @@ def test_client_extra_url_params_debug_2():
 
 @patch.dict(os.environ, {"IAM_API_FORCE": "true"})
 def test_client_extra_url_params_force_1():
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
     assert c._extra_url_params
     assert len(c._extra_url_params) == 1
     assert c._extra_url_params.get("force") == "true"
@@ -136,7 +136,7 @@ def test_client_extra_url_params_force_1():
 
 @patch.dict(os.environ, {"BKAPP_IAM_API_FORCE": "true"})
 def test_client_extra_url_params_force_2():
-    c = Client("bk_paas", "", "http://127.0.0.1:1234", "")
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
     assert c._extra_url_params
     assert len(c._extra_url_params) == 1
     assert c._extra_url_params.get("force") == "true"

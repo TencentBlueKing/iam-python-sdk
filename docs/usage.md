@@ -712,3 +712,24 @@ urlpatterns = [
     url(r'^resource/api/v1/$', dispatcher.as_view([login_exempt]))
 ]
 ```
+
+------------------------------
+
+## 4. 切换使用 APIGateway
+
+未来 APIGateway 高性能网关会作为一个基础的蓝鲸服务, 权限中心将会把后台及 SaaS 的所有开放 API 接入到网关中`bk-iam`
+
+此时, 对于接入方, 不管是鉴权/申请权限还是其他接口, 都可以通过同一个网关访问到.
+
+理解成本更低, 且相关的调用日志/文档/流控/监控等都可以在 APIGateway 统一管控.
+
+网关地址类似: `http://bk-iam.{APIGATEWAY_DOMAIN}/{env}`, 其中 `env`值 `prod(生产)/stage(预发布)`
+
+SDK 目前做了兼容, 可以修改初始化 SDK 的参数, 切换流量到 APIGateway
+
+```python
+# 测试环境, 使用stage
+IAM(app_code, app_secret, bk_apigateway_url="http://bk-iam.{APIGATEWAY_DOMAIN}/stage"):
+# 正式环境, 使用prod
+IAM(app_code, app_secret, bk_apigateway_url="http://bk-iam.{APIGATEWAY_DOMAIN}/prod"):
+```

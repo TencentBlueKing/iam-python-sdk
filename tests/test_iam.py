@@ -27,7 +27,7 @@ from iam.iam import IAM
 
 
 def new_mock_iam():
-    return IAM("test", "test", "iam_host", "paas_host")
+    return IAM("test", "test", "iam_host", "paas_host", None)
 
 
 def new_valid_request():

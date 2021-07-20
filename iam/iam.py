@@ -37,8 +37,15 @@ class IAM(object):
     input: object
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host):
-        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host)
+    def __init__(self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None):
+        """
+        如果有 APIGateway 且权限中心网关接入, 则可以统一API请求全部走APIGateway
+        - 没有APIGateway的用法: IAM(app_code, app_secret, bk_iam_host, bk_paas_host)
+        - 有APIGateway的用法: IAM(app_code, app_secret, bk_apigateway_url)
+
+        NOTE: 未来将会下线`没有 APIGateway的用法`
+        """
+        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_apigateway_url)
 
     def _do_policy_query(self, request, with_resources=True):
         data = request.to_dict()
