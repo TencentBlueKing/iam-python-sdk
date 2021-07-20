@@ -44,6 +44,7 @@ class IAM(object):
         - 有APIGateway的用法: IAM(app_code, app_secret, bk_apigateway_url)
 
         NOTE: 未来将会下线`没有 APIGateway的用法`
+        TODO: 切换后, 所有暴露接口将不再依赖 bk_token/bk_username, 需考虑兼容调用方, 并文档说明
         """
         self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_apigateway_url)
 
