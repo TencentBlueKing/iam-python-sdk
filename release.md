@@ -1,5 +1,8 @@
 版本日志
 ===============
+# v1.1.16
+
+- add: support call apis via APIGateway
 
 # v1.1.15
 
