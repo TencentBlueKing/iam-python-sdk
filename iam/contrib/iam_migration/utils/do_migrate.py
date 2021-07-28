@@ -25,6 +25,7 @@ import requests
 __version__ = "1.0.0"
 
 BK_IAM_HOST = os.getenv("BK_IAM_V3_INNER_HOST", "http://bkiam.service.consul:5001")
+USE_APIGATEWAY = os.getenv("BK_IAM_USE_APIGATEWAY", "false").lower() == "true"
 
 APP_CODE = ""
 APP_SECRET = ""
@@ -143,6 +144,11 @@ class Client(object):
     # 调用权限中心方法
     def _call_iam_api(self, http_func, path, data):
         headers = {"X-BK-APP-CODE": self.app_code, "X-BK-APP-SECRET": self.app_secret}
+        if USE_APIGATEWAY:
+            headers = {
+                "X-Bkapi-Authorization": json.dumps({"bk_app_code": self.app_code, "bk_app_secret": self.app_secret}),
+            }
+
         url = "{host}{path}".format(host=self.bk_iam_host, path=path)
         ok, _data = http_func(url, data, headers=headers)
         # TODO: add debug here
@@ -588,7 +594,14 @@ def do_migrate(data, bk_iam_host=BK_IAM_HOST, app_code=APP_CODE, app_secret=APP_
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument(
-        "-t", action="store", dest="bk_iam_host", help="bk_iam_host, i.e: http://iam.service.consul", required=True
+        "-t",
+        action="store",
+        dest="bk_iam_host",
+        help=(
+            "bk_iam_host, i.e: http://iam.service.consul;"
+            "you can use bk_apigateway_url here, set with the '--apigateway' "
+        ),
+        required=True,
     )
     p.add_argument(
         "-f",
@@ -599,9 +612,23 @@ if __name__ == "__main__":
     )
     p.add_argument("-a", action="store", dest="app_code", help="app code", required=True)
     p.add_argument("-s", action="store", dest="app_secret", help="app secret", required=True)
+
+    p.add_argument(
+        "--apigateway",
+        action="store_true",
+        dest="use_apigateway",
+        help="you can use bk_apigateway_url in '-t', should set this flag",
+    )
     args = p.parse_args()
 
     BK_IAM_HOST = args.bk_iam_host.rstrip("/")
+    USE_APIGATEWAY = args.use_apigateway
+    if USE_APIGATEWAY:
+        print(
+            "use apigateway:",
+            args.use_apigateway,
+            ", please make sure '-t %s' is a valid bk_apigateway_url" % args.bk_iam_host,
+        )
 
     if not BK_IAM_HOST.startswith("http://"):
         BK_IAM_HOST = "http://%s" % BK_IAM_HOST

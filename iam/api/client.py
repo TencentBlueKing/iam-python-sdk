@@ -21,6 +21,7 @@ import time
 from cachetools import TTLCache, cached
 from requests.models import PreparedRequest
 
+from iam.exceptions import AuthAPIError
 from .http import http_delete, http_get, http_post, http_put
 
 logger = logging.getLogger("iam")
@@ -33,11 +34,29 @@ class Client(object):
     input: json
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host):
+    def __init__(self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None):
+        """
+        如果有 APIGateway 且权限中心网关接入, 则可以统一API请求全部走APIGateway
+        - 没有APIGateway的用法: Client(app_code, app_secret, bk_iam_host, bk_paas_host)
+        - 有APIGateway的用法: Client(app_code, app_secret, bk_apigateway_url)
+
+        NOTE: 未来将会下线`没有 APIGateway的用法`
+        """
         self._app_code = app_code
         self._app_secret = app_secret
-        self._host = bk_iam_host
-        self._bk_paas_host = bk_paas_host
+
+        # enabled apigateay
+        self._apigateway_on = False
+        if bk_apigateway_url:
+            self._apigateway_on = True
+            # replace the host
+            self._host = bk_apigateway_url.rstrip("/")
+        else:
+            if not (bk_iam_host and bk_paas_host):
+                raise AuthAPIError("init client fail, bk_iam_host and bk_paas_host should not be empty")
+
+            self._host = bk_iam_host
+            self._bk_paas_host = bk_paas_host
 
         # will add ?debug=true in url, for debug api/policy, show the details
         isApiDebugEnabled = os.environ.get("IAM_API_DEBUG") == "true" or os.environ.get("BKAPP_IAM_API_DEBUG") == "true"
@@ -78,19 +97,45 @@ class Client(object):
 
         return True, "ok", _d
 
+    def _call_apigateway_api(self, http_func, path, data, timeout=None):
+        """
+        统一后, 所有接口调用走APIGateway
+        """
+        headers = {
+            "X-Bkapi-Authorization": json.dumps({"bk_app_code": self._app_code, "bk_app_secret": self._app_secret}),
+            "X-Bk-IAM-Version": BK_IAM_VERSION,
+        }
+        return self._call_api(http_func, self._host, path, data, headers, timeout=timeout)
+
     def _call_iam_api(self, http_func, path, data, timeout=None):
+        """
+        兼容切换到apigateway, 统一后, 这个方法应该去掉
+        """
+        if self._apigateway_on:
+            return self._call_apigateway_api(http_func, path, data, timeout)
+
+        # call directly
         headers = {
             "X-BK-APP-CODE": self._app_code,
             "X-BK-APP-SECRET": self._app_secret,
             "X-Bk-IAM-Version": BK_IAM_VERSION,
         }
+
         return self._call_api(http_func, self._host, path, data, headers, timeout=timeout)
 
     def _call_esb_api(self, http_func, path, data, bk_token, bk_username, timeout=None):
-        headers = {
-            # "BK-APP-CODE": self._app_code,
-            # "BK-APP-SECRET": self._app_secret,
-        }
+        """
+        兼容切换到apigateway, 统一后, 这个方法应该去掉
+        """
+        if self._apigateway_on:
+            apigw_path = path.replace("/api/c/compapi/v2/iam/", "/api/v1/open/")
+            if not path.startswith("/api/v1/open/"):
+                raise AuthAPIError("can't find the matched apigateway path, the esb api path is %s" % path)
+
+            return self._call_apigateway_api(http_func, apigw_path, data, timeout)
+
+        # call esb
+        headers = {}
         data.update(
             {
                 "bk_app_code": self._app_code,
