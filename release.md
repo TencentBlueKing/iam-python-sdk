@@ -1,5 +1,12 @@
 版本日志
 ===============
+# v1.1.16
+
+- add: support call apis via APIGateway
+
+# v1.1.15
+
+- bugfix: 修复当settings没有提供BK_IAM_SKIP变量导致migrate失败的问题
 
 # v1.1.15
 
