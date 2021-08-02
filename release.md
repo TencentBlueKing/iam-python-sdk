@@ -1,8 +1,12 @@
 版本日志
 ===============
+# v1.1.17
+
+- contrib/iam_migration support calling api via APIGateway
+
 # v1.1.16
 
-- add: support call apis via APIGateway
+- add: support calling apis via APIGateway
 
 # v1.1.15
 
