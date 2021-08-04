@@ -452,7 +452,11 @@ BK_IAM_API_PREFIX = SITE_URL + 'openapi'
 
 - `APP_CODE/SECRET_KEY` 应用在蓝鲸开发者中心申请应用的`app_code/app_secret`
 - `BK_IAM_SYSTEM_ID` 接入系统注册到权限中心使用的系统 ID(system_id)
-- `BK_IAM_INNER_HOST` 权限中心后台的地址
+- 调用方式(二选一, 如果有 APIGateway, 优先使用 APIGateway):
+    - 直连: `BK_IAM_INNER_HOST` 权限中心后台的地址
+    - APIGateway:
+        - `BK_IAM_USE_APIGATEWAY = True`
+        - `BK_IAM_APIGATEWAY_URL = "http://bk-iam.{APIGATEWAY_DOMAIN}/{env}"`
 - `BK_IAM_MIGRATION_JSON_PATH`：如果你不想将 iam migration json 放置在 `support-files/iam/` 目录下，请在 Django Setting 中将该变量配置为你想要存放 iam migration json 文件的相对目录
 - `BK_IAM_RESOURCE_API_HOST`：如果你无法确定 upsert_system 操作 data 中的 `provider_config.host` 的值，那么可以在 Django Setting 中配置这个变量，IAM Migration 会在执行 upsert_system 操作前将 `provider_config.host` 设置为 `BK_IAM_RESOURCE_API_HOST`
 - `BK_IAM_MIGRATION_APP_NAME`：如果你是以 pip 的方式安装 iam sdk，那么请单独新建一个 Django app，将 `BK_IAM_MIGRATION_APP_NAME` 设置为该 app 的 label，并将该 app 加入 `INSTALLED_APPS` 中，iam migrator 会将 Django migration 文件置于该 app 的 `migrations` 目录下。
@@ -733,3 +737,8 @@ IAM(app_code, app_secret, bk_apigateway_url="http://bk-iam.{APIGATEWAY_DOMAIN}/s
 # 正式环境, 使用prod
 IAM(app_code, app_secret, bk_apigateway_url="http://bk-iam.{APIGATEWAY_DOMAIN}/prod"):
 ```
+
+如果使用了sdk提供的 IAM Migration, 需要设置环境变量
+
+- `BK_IAM_USE_APIGATEWAY = True`
+- `BK_IAM_APIGATEWAY_URL = "http://bk-iam.{APIGATEWAY_DOMAIN}/{env}"`

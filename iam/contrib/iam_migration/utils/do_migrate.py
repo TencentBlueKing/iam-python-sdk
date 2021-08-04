@@ -33,6 +33,9 @@ data_file = ""
 
 
 # =================== load json ===================
+def enable_use_apigateway():
+    global USE_APIGATEWAY
+    USE_APIGATEWAY = True
 
 
 def load_data(filename):
