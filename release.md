@@ -1,5 +1,9 @@
 版本日志
 ===============
+# v1.1.18
+
+- bugfix: raise exception after replace esb api prefix
+
 # v1.1.17
 
 - contrib/iam_migration support calling api via APIGateway
