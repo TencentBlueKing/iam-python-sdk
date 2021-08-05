@@ -129,7 +129,7 @@ class Client(object):
         """
         if self._apigateway_on:
             apigw_path = path.replace("/api/c/compapi/v2/iam/", "/api/v1/open/")
-            if not path.startswith("/api/v1/open/"):
+            if not apigw_path.startswith("/api/v1/open/"):
                 raise AuthAPIError("can't find the matched apigateway path, the esb api path is %s" % path)
 
             return self._call_apigateway_api(http_func, apigw_path, data, timeout)
