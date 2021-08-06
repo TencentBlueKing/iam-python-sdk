@@ -598,6 +598,7 @@ from blueapps.account.decorators import login_exempt
 from iam import IAM
 from iam.contrib.django.dispatcher import DjangoBasicResourceApiDispatcher
 from iam.resource.provider import ResourceProvider, ListResult
+from iam.contrib.converter.queryset import PathEqDjangoQuerySetConverter
 from django.conf.urls import url, include
 
 iam = IAM(
