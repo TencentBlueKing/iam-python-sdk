@@ -36,16 +36,18 @@ class IAMMigrator(object):
         self.migration_json = migration_json
 
     def migrate(self):
-        iam_host = settings.BK_IAM_INNER_HOST
         app_code = settings.APP_CODE
         app_secret = settings.SECRET_KEY
 
+        iam_host = ""
         USE_APIGATEWAY = getattr(settings, "BK_IAM_USE_APIGATEWAY", False)
         if USE_APIGATEWAY:
             do_migrate.enable_use_apigateway()
             iam_host = getattr(settings, "BK_IAM_APIGATEWAY_URL", "")
             if iam_host == "":
                 raise exceptions.MigrationFailError("settings.BK_IAM_APIGATEWAY_URL should be setted")
+        else:
+            iam_host = settings.BK_IAM_INNER_HOST
 
         # only trigger migrator at db migrate
         if "migrate" not in sys.argv:
