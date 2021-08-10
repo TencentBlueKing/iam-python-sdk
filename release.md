@@ -1,5 +1,9 @@
 版本日志
 ===============
+# v1.1.19
+
+- bugfix: iam migration via apigateway should not use settings.BK_IAM_INNER_HOST
+
 # v1.1.18
 
 - bugfix: raise exception after replace esb api prefix
