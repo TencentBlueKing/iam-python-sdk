@@ -49,6 +49,9 @@ def test_basic_resource_api_dispatcher_register():
 
         def list_instance_by_policy(self, filter, page, **options):
             return ListResult(results=[filter, page], count=100)
+        
+        def search_instance(self, filter, page, **options):
+            return ListResult(results=[filter, page], count=100)
 
     with pytest.raises(AuthInvalidOperation):
         dispatcher.register("type", "provider")

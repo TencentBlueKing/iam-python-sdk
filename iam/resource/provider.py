@@ -72,3 +72,11 @@ class ResourceProvider(object):
         return: ListResult
         """
         raise NotImplementedError()
+
+    @abc.abstractmethod
+    def search_instance(self, filter, page, **options):
+        """
+        处理来自 iam 的 search_instance 请求
+        return: ListResult
+        """
+        raise NotImplementedError()
