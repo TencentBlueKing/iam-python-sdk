@@ -10,12 +10,39 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 
+import os
+import sys
 
+import six
 from django.apps import AppConfig
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
-from iam.contrib.iam_migration.constants import APP_NAME, APP_VERBOSE_NAME
+from iam.contrib.iam_migration.constants import APP_NAME, APP_VERBOSE_NAME, BK_IAM_MIGRATION_APP_NAME
 
 
 class IAMMigrationConfig(AppConfig):
     name = APP_NAME
+    label = name.rpartition(".")[2]
+    default = True
     verbose_name = APP_VERBOSE_NAME
+
+    def ready(self):
+        # dist-packages: Debian distributions modify upstream Python
+        for site_or_dist in ("site-packages", "dist-packages"):
+            module_package_path = os.path.join("lib", "python%d.%d" % sys.version_info[:2], site_or_dist, "iam")
+            if module_package_path in self.path:
+                break
+        else:
+            return
+        # Checking must be set `BK_IAM_MIGRATION_APP_NAME` for pip installation
+        if not getattr(settings, BK_IAM_MIGRATION_APP_NAME, None):
+            raise ImproperlyConfigured(
+                "The %r setting must not be empty for iam with pip installation package" % BK_IAM_MIGRATION_APP_NAME
+            )
+        if not isinstance(settings.BK_IAM_MIGRATION_APP_NAME, six.string_types):
+            raise ImproperlyConfigured(
+                "The %r setting must be instance of %s" % (BK_IAM_MIGRATION_APP_NAME, six.string_types)
+            )
+        if settings.BK_IAM_MIGRATION_APP_NAME not in settings.INSTALLED_APPS:
+            raise ImproperlyConfigured("The %r setting not in installed apps" % BK_IAM_MIGRATION_APP_NAME)

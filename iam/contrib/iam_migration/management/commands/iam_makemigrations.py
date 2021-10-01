@@ -38,15 +38,16 @@ class Command(BaseCommand):
         json_file = options["migration_json"]
         if not json_file:
             sys.stderr.write("please provide a migration json file name\n")
-            exit(1)
+            sys.exit(1)
 
         json_path = getattr(settings, "BK_IAM_MIGRATION_JSON_PATH", "support-files/iam/")
         file_path = os.path.join(settings.BASE_DIR, json_path, json_file)
-
         if not os.path.exists(file_path):
             sys.stderr.write("{} is not exist.\n".format(file_path))
-            exit(1)
+            sys.exit(1)
 
+        iam_migration_app_instance = apps.get_app_config(IAMMigrationConfig.label)
+        iam_migration_app_instance.ready()
         loader = MigrationLoader(None, ignore_no_migrations=False)
         migration_leaf = loader.graph.leaf_nodes(conf.MIGRATION_APP_NAME)
 
@@ -62,8 +63,11 @@ class Command(BaseCommand):
 
         migration_name = self.migration_name(last_migration_name)
         migration_file = "{}.py".format(
-            os.path.join(apps.get_app_config(conf.MIGRATION_APP_NAME).path, "migrations", migration_name)
+            os.path.join(
+                apps.get_app_config(conf.MIGRATION_APP_NAME.rpartition(".")[2]).path, "migrations", migration_name
+            )
         )
+        sys.stdout.write("write migrations file: {}\n".format(migration_file))
 
         with codecs.open(migration_file, mode="w", encoding="utf-8") as fp:
             template = Engine.get_default().from_string(migration_template)
@@ -86,7 +90,7 @@ class Command(BaseCommand):
 
         if not system_id:
             self.stderr.write("You must set BK_IAM_SYSTEM_ID in django settings before make migrations")
-            exit(1)
+            sys.exit(1)
 
         if not last_migration_name:
             return "0001_initial"

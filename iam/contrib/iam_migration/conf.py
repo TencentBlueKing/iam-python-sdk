@@ -13,6 +13,6 @@ specific language governing permissions and limitations under the License.
 
 from django.conf import settings
 
-from iam.contrib.iam_migration.constants import APP_NAME
+from iam.contrib.iam_migration.constants import APP_NAME, BK_IAM_MIGRATION_APP_NAME
 
-MIGRATION_APP_NAME = getattr(settings, "BK_IAM_MIGRATION_APP_NAME", APP_NAME)
+MIGRATION_APP_NAME = getattr(settings, BK_IAM_MIGRATION_APP_NAME, APP_NAME)
