@@ -4,8 +4,7 @@
 
 ### 1.1 开启debug 及配置流水日志
 
-
-#### Debug
+#### 1.1.1 Debug
 
 **注意**: `debug`仅在调试阶段开启, 生产环境请关闭(`iam_looger.setLevel(logging.ERROR)`);
 
@@ -54,7 +53,7 @@ DEBUG [2020-05-21 14:23:22,921] [IAM] the return expr eval took 0 ms
 - `the return expr` 包含最终表达式的原始数据/渲染数据/求值结果/求值耗时
 
 
-#### API DEBUG
+#### 1.1.2 API DEBUG
 
 注意: `仅用于开发/联调环境排查定位问题, 一定不要在生产环境中开启, 将会导致API性能急剧下降`
 
@@ -63,8 +62,7 @@ DEBUG [2020-05-21 14:23:22,921] [IAM] the return expr eval took 0 ms
 - `IAM_API_DEBUG=true` or `BKAPP_IAM_API_DEBUG=true`: 会在api url中加入`?debug=true`, 使得请求返回json中多返回`debug`字段, 包含策略相关的完整上下文信息, 用于精确定位api执行过程
 - `IAM_API_FORCE=true` or `BKAPP_IAM_API_FORCE=true`: 会在api url中加入`?force=true`, 请求将不走缓存, 直接从db中获取数据, 用于排查缓存类bug
 
-
-#### 流水日志
+#### 1.1.3 流水日志
 
 生产环境, 可能需要保留IAM流水日志, 用于后续问题排查及定位
 
@@ -74,7 +72,7 @@ DEBUG [2020-05-21 14:23:22,921] [IAM] the return expr eval took 0 ms
 - 日志级别设置为INFO: 请求流水日志, 包含成功/失败等(建议)
 - 日志级别设置为ERROR: 报错日志, 网络请求及非200返回
 
-以django为例
+以Django为例
 
 ```python
 LOGGING = {
@@ -106,18 +104,9 @@ LOGGING = {
 }
 ```
 
+### 1.2 鉴权
 
-
-### 1.2 is_allowed
-
-**注意**, 对于非敏感权限, 可以调用`is_allowed_with_cache(request)`, 默认缓存10s.
-(注意: 不要用于新建关联权限的资源is_allowed判定, 否则可能新建一个资源新建关联生效之后跳转依旧没权限; 更多用于`管理权限/未依赖资源的权限`权限判断)
-
-```python
-    # cache 10s, 10s不会重新请求权限并进行鉴权计算, 能加快前端的体验
-    self._iam.is_allowed_with_cache(request)
-```
-
+#### 1.2.1 is_allowed
 
 > 查询是否有某个操作权限(没有资源实例), 例如访问开发者中心
 
@@ -173,8 +162,11 @@ class Permission(object):
         return self._iam.is_allowed(request)
 ```
 
+#### 1.2.2 batch_is_allowed
 
-如果需要对一批资源同时进行鉴权, 可以调用`batch_is_allowed` (注意这个封装不支持跨系统资源依赖, 只支持接入系统自己的本地资源
+> 对一批资源同时进行鉴权
+
+可以调用`batch_is_allowed` (注意这个封装不支持跨系统资源依赖, 只支持接入系统自己的本地资源
 
 ```python
 
@@ -194,14 +186,87 @@ request = Request(
     None
 )
 
-
 iam = IAM("bk_sops", "app_secret", "bk_iam_host", "bk_paas_host")
 
 iam.batch_is_allowed(request, [[resource1], [resource2], [resource3]]))
 # {'1': True, '2': False, '3': True}
 ```
 
-### 1.3 make_filter
+#### 1.2.3 resource_multi_actions_allowed
+
+> 对一个资源的多个操作同时进行鉴权
+
+可以调用`resource_multi_actions_allowed`进行批量操作权限的鉴权
+
+```python
+subject = Subject("user", "tom")
+action1 = Action("flow_edit")
+action2 = Action("flow_view")
+action3 = Action("flow_delete")
+resource1 = Resource("bk_sops", "flow", "1", {})
+
+request = MultiActionRequest(
+    "bk_sops",
+    subject,
+    [action1, action2, action3],
+    [resource1],
+    None
+)
+
+
+iam = IAM(
+    "bk_sops", "app_secret",
+    "bk_iam_host", "bk_paas_host"
+)
+iam.resource_multi_actions_allowed(request)
+# {'flow_edit': True, 'flow_view': True, 'flow_delete': False}
+```
+
+#### 1.2.4 batch_resource_multi_actions_allowed
+
+> 对于批量资源的多个操作同时进行鉴权, 例如进入资源列表也，可能需要在前端展示当前用户关于列表中的资源的一批操作的权限信息
+
+可以调用`batch_resource_multi_actions_allowed`
+
+```python
+subject = Subject("user", "tom")
+action1 = Action("flow_edit")
+action2 = Action("flow_view")
+action3 = Action("flow_delete")
+resource1 = Resource("bk_sops", "flow", "1", {})
+resource2 = Resource("bk_sops", "flow", "2", {})
+resource3 = Resource("bk_sops", "flow", "3", {})
+
+request = MultiActionRequest(
+    "bk_sops",
+    subject,
+    [action1, action2, action3],
+    [],
+    None
+)
+
+
+iam = IAM(
+    "bk_sops", "app_secret",
+    "bk_iam_host", "bk_paas_host"
+)
+iam.batch_resource_multi_actions_allowed(request, [[resource1], [resource2], [resource3]]))
+# {'1': {'flow_edit': True, 'flow_view': True, 'flow_delete': False}, '2': {'flow_edit': True, 'flow_view': True, 'flow_delete': False}, '3': {'flow_edit': True, 'flow_view': True, 'flow_delete': False}}
+```
+
+#### 1.2.5 is_allowed_with_cache
+
+> 对于非敏感权限
+
+可以调用`is_allowed_with_cache(request)`, 默认缓存10s.
+(注意: 不要用于新建关联权限的资源is_allowed判定, 否则可能新建一个资源新建关联生效之后跳转依旧没权限; 更多用于`管理权限/未依赖资源的权限`权限判断)
+
+```python
+    # cache 10s, 10s内不会重新请求权限并进行鉴权计算, 能加快前端的体验
+    self._iam.is_allowed_with_cache(request)
+```
+
+### 1.3 用户有权限的资源列表
 
 > 查询某个用户有权限的资源列表, 例如查询某个用户有开发权限的应用列表
 
@@ -242,7 +307,6 @@ iam.batch_is_allowed(request, [[resource1], [resource2], [resource3]]))
 
 > 没有权限时, 在前端展示要申请的权限列表, 需要访问IAM接口, 拿到申请权限url; 用户点击跳转到IAM SaaS对应页面申请权限
 
-文档: TODO
 
 - 申请不带资源实例的权限
 
@@ -310,67 +374,7 @@ class Permission(object):
         return url
 ```
 
-
-### 1.5 获取用户关于某批资源某批操作的权限信息
-
-> 进入资源列表也，可能需要在前端展示当前用户关于列表中的资源的一批操作的权限信息
-
-```python
-subject = Subject("user", "tom")
-action1 = Action("flow_edit")
-action2 = Action("flow_view")
-action3 = Action("flow_delete")
-resource1 = Resource("bk_sops", "flow", "1", {})
-resource2 = Resource("bk_sops", "flow", "2", {})
-resource3 = Resource("bk_sops", "flow", "3", {})
-
-request = MultiActionRequest(
-    "bk_sops",
-    subject,
-    [action1, action2, action3],
-    [],
-    None
-)
-
-
-iam = IAM(
-    "bk_sops", "app_secret",
-    "bk_iam_host", "bk_paas_host"
-)
-iam.batch_resource_multi_actions_allowed(request, [[resource1], [resource2], [resource3]]))
-# {'1': {'flow_edit': True, 'flow_view': True, 'flow_delete': False}, '2': {'flow_edit': True, 'flow_view': True, 'flow_delete': False}, '3': {'flow_edit': True, 'flow_view': True, 'flow_delete': False}}
-```
-
-或者, 获取一个资源某批操作的权限信息
-
-
-```python
-subject = Subject("user", "tom")
-action1 = Action("flow_edit")
-action2 = Action("flow_view")
-action3 = Action("flow_delete")
-resource1 = Resource("bk_sops", "flow", "1", {})
-
-request = MultiActionRequest(
-    "bk_sops",
-    subject,
-    [action1, action2, action3],
-    [resource1],
-    None
-)
-
-
-iam = IAM(
-    "bk_sops", "app_secret",
-    "bk_iam_host", "bk_paas_host"
-)
-iam.resource_multi_actions_allowed(request)
-# {'flow_edit': True, 'flow_view': True, 'flow_delete': False}
-```
-
-
-
-### 1.6 生成无权限描述协议数据
+### 1.5 生成无权限描述协议数据
 
 使用 `iam.utils.gen_perms_apply_data` 可以生成生成[无权限描述协议数据](#)，其接收参数如下：
 
@@ -422,7 +426,7 @@ data = gen_perms_apply_data(
 )
 ```
 
-### 1.7 通过API请求返回无权限的通用配置
+### 1.6 通过API请求返回无权限的通用配置
 
  sdk提供`AuthFailedExceptionMiddleware` 特殊处理鉴权不通过异常`AuthFailedBaseException`的时候，默认返回HTTP状态码为`499`，API的请求则可以通过在`settings`中配置参数`BK_IAM_API_PREFIX`进行前缀匹配，匹配通过时返回的状态码为`200`
 
@@ -432,12 +436,7 @@ data = gen_perms_apply_data(
  # settings.py 配置如下：
 
 BK_IAM_API_PREFIX = SITE_URL + 'openapi'
-
 ```
-
-
-
-------------------------------
 
 ## 2. IAM Migration
 
@@ -445,27 +444,35 @@ BK_IAM_API_PREFIX = SITE_URL + 'openapi'
 
 1. 将 `iam.contrib.iam_migration` 加入 `INSTALLED_APPS` 中
 2. 在项目根目录的 `support-files/iam/` 中添加 iam migration json 文件
-3. 执行 `python manage.py iam_makemigrations {migration_json_file_name}` （其中 `migration_json_file_name}` 为新加入的 iam migration json 文件名），该命令会在 `iam/contrib/iam_migration/migrations` 目录下生成用于执行向权限中心注册系统、资源和操作的 migration 文件，当应用第一次部署时，这些 migration 文件会随之执行。
+3. 执行 `python manage.py iam_makemigrations {migration_json_file_name}` 
+    - 其中 `{migration_json_file_name}` 为新加入的 iam migration json 文件名
+    - 该命令会在 `iam/contrib/iam_migration/migrations` 目录下生成用于执行向权限中心注册系统、资源和操作的 migration 文件，当应用第一次部署时，这些 migration 文件会随之执行。
     - **注意：如果你的 iam sdk 不是以源码的方式嵌入项目中而是以 pip 的方式安装的，那么请额外配置 `BK_IAM_MIGRATION_APP_NAME` 来设置用于存储 migration 文件的 APP**
 
-#### 2.2 CONFIG
+### 2.2 CONFIG
+
+基本配置
 
 - `APP_CODE/SECRET_KEY` 应用在蓝鲸开发者中心申请应用的`app_code/app_secret`
 - `BK_IAM_SYSTEM_ID` 接入系统注册到权限中心使用的系统 ID(system_id)
-- 调用方式(二选一, 如果有 APIGateway, 优先使用 APIGateway):
+- 调用方式(二选一, **如果有 APIGateway, 优先使用 APIGateway**):
     - 直连: `BK_IAM_INNER_HOST` 权限中心后台的地址
     - APIGateway:
         - `BK_IAM_USE_APIGATEWAY = True`
         - `BK_IAM_APIGATEWAY_URL = "http://bk-iam.{APIGATEWAY_DOMAIN}/{env}"`
-- `BK_IAM_MIGRATION_JSON_PATH`：如果你不想将 iam migration json 放置在 `support-files/iam/` 目录下，请在 Django Setting 中将该变量配置为你想要存放 iam migration json 文件的相对目录
-- `BK_IAM_RESOURCE_API_HOST`：如果你无法确定 upsert_system 操作 data 中的 `provider_config.host` 的值，那么可以在 Django Setting 中配置这个变量，IAM Migration 会在执行 upsert_system 操作前将 `provider_config.host` 设置为 `BK_IAM_RESOURCE_API_HOST`
-- `BK_IAM_MIGRATION_APP_NAME`：如果你是以 pip 的方式安装 iam sdk，那么请单独新建一个 Django app，将 `BK_IAM_MIGRATION_APP_NAME` 设置为该 app 的 label，并将该 app 加入 `INSTALLED_APPS` 中，iam migrator 会将 Django migration 文件置于该 app 的 `migrations` 目录下。
-- `BK_IAM_SKIP`: 是否跳过iam migration, 某些版本(<1.1.15)sdk强依赖, 可以设置成`False`或`None`
-  - >TIPS：
-    > - 可以使用 `python manage.py startapp {app_name}` 命令来新建 django app
-    > - 如果 app 是已存在的，请确保该 app 目录下存在 `migrations/__init__.py` 文件）
 
-------------------------------
+Migration 相关
+
+- `BK_IAM_MIGRATION_JSON_PATH`：如果你不想将 iam migration json 放置在 `support-files/iam/` 目录下，请在 Django Setting 中将该变量配置为你想要存放 iam migration json 文件的相对目录
+- `BK_IAM_MIGRATION_APP_NAME`：如果你是以 pip 的方式安装 iam sdk，那么请单独新建一个 Django app，将 `BK_IAM_MIGRATION_APP_NAME` 设置为该 app 的 label，并将该 app 加入 `INSTALLED_APPS` 中，iam migrator 会将 Django migration 文件置于该 app 的 `migrations` 目录下。
+- `BK_IAM_RESOURCE_API_HOST`：如果你无法确定 upsert_system 操作 data 中的 `provider_config.host` 的值，那么可以在 Django Setting 中配置这个变量，IAM Migration 会在执行 upsert_system 操作前将 `provider_config.host` 设置为 `BK_IAM_RESOURCE_API_HOST`
+- `BK_IAM_SKIP`: 是否跳过iam migration, 某些版本(<1.1.15)sdk强依赖, 可以设置成`False`或`None`
+
+其他
+
+- TIPS：
+    - 可以使用 `python manage.py startapp {app_name}` 命令来新建 django app
+    - 如果 app 是已存在的，请确保该 app 目录下存在 `migrations/__init__.py` 文件）
 
 ## 3. Resource API Framework
 
@@ -480,13 +487,13 @@ Resource API Framework 中有两个核心概念：
 
 用户自定义的 Provider 必须继承自 `iam.resource.provider.ResourceProvider`，并且实现以下方法：
 
-- `list_attr(**options)`：处理来自 IAM 的 list_attr 请求
-  - 输入：
+1. `list_attr(**options)`：处理来自 IAM 的 list_attr 请求
+  - 参数：
     - `options`：
       - `language(str)`：国际化语言
-  - 输出：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_attr 响应协议
-- `list_attr_value(filter, page, **options)`：处理来自 IAM 的 list_attr_value 请求
-  - 输入：
+  - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_attr 响应协议
+2. `list_attr_value(filter, page, **options)`：处理来自 IAM 的 list_attr_value 请求
+  - 参数：
     - `filter`：过滤器对象
       - `filter.attr(str)`：需要查询的资源属性id
       - `filter.keyword(str)`：资源属性值的搜索关键字
@@ -496,9 +503,9 @@ Resource API Framework 中有两个核心概念：
       - `page.offset(int)`：查询偏移
     - `options`：
       - `language(str)`：国际化语言
-  - 输出：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_attr_value 响应协议
-- `list_instance(filter, page, **options)`：处理来自 IAM 的 list_instance 请求
-  - 输入：
+  - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_attr_value 响应协议
+3. `list_instance(filter, page, **options)`：处理来自 IAM 的 list_instance 请求
+  - 参数：
     - `filter`：过滤器对象
       - `filter.parent(dict)`：资源的直接上级，具体包含type和id，type为直接上级资源的类型，id为直接上级资源实例ID
       - `filter.search(str)`：资源实例的搜索关键字
@@ -508,17 +515,17 @@ Resource API Framework 中有两个核心概念：
       - `page.offset(int)`：查询偏移
     - `options`：
       - `language`：国际化语言
-  - 输出：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_instance 响应协议
-- `fetch_instance_info(filter, page, **options)`：处理来自 IAM 的 fetch_instance_info 请求
-  - 输入：
+  - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_instance 响应协议
+4. `fetch_instance_info(filter, page, **options)`：处理来自 IAM 的 fetch_instance_info 请求
+  - 参数：
     - `filter`：过滤器对象
       - `filter.ids(list[str])`：需要查询的资源实例的唯一标识列表
       - `filter.attrs(lsit[str])`：需要查询的资源属性列表，比如["path", "os"]，空列表或无该参数则表示查询所有属性
     - `options`：
       - `language`：国际化语言
-  - 输出：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM fetch_instance_info 响应协议
-- `list_instance_by_policy(filter, page, **options)`：处理来自 IAM 的 list_instance_by_policy 请求
-  - 输入：
+  - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM fetch_instance_info 响应协议
+5. `list_instance_by_policy(filter, page, **options)`：处理来自 IAM 的 list_instance_by_policy 请求
+  - 参数：
     - `filter`：过滤器对象
       - `filter.expression(dict)`：资源的表达式，[协议请查看](#)
     - `page`：分页对象
@@ -526,7 +533,7 @@ Resource API Framework 中有两个核心概念：
       - `page.offset(int)`：查询偏移
     - `options`：
       - `language`：国际化语言
-  - 输出：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_instance_by_policy 响应协议
+  - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_instance_by_policy 响应协议
 
 除此之外，如果 Provider 中定义了 `pre_{method}` 方法（`method` 可选值（`list_attr`, `list_attr_value`, `list_instance`, `fetch_instance_info`, `list_instance_by_policy`），Dispatcher 会在调用对应的 `{method}` 方法前调用其对应的 `pre` 方法进行预处理，下面的例子检测 `list_instance` 中传入的 page 对象，如果 limit 过大，则拒绝该请求：
 
@@ -577,7 +584,7 @@ class ProjectResourceProvider(ResourceProvider):
 - `system`：对应系统的 ID (**注意**, `这里是systemID, 不是app_code, 一定不能传app_code, 某些环境systemID不一定是app_code`)
 
 
-#### `register(resource_type, provieprovider)`
+##### `register(resource_type, provieprovider)`
 
 注册类型为 `resource_type` 的 Provider
 
@@ -585,7 +592,7 @@ class ProjectResourceProvider(ResourceProvider):
 - `provider`：`iam.resource.provider.ResourceProvider` 的子类实例
 
 
-#### `as_view(decorators=[])`
+##### `as_view(decorators=[])`
 
 返回能够作为 Resource API 的 view 函数
 
@@ -717,8 +724,6 @@ urlpatterns = [
     url(r'^resource/api/v1/$', dispatcher.as_view([login_exempt]))
 ]
 ```
-
-------------------------------
 
 ## 4. 切换使用 APIGateway
 
