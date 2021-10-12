@@ -1,5 +1,11 @@
 版本日志
 ===============
+# v1.1.20
+
+- bugfix: 修复 iam sdk 拷贝到本地使用后执行 iam_makemigrations 报错的问题
+- update: docs/usage.md
+- add: ResourceProvider添加search_instance抽象方法
+
 # v1.1.19
 
 - bugfix: iam migration via apigateway should not use settings.BK_IAM_INNER_HOST
