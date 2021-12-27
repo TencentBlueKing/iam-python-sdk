@@ -6,7 +6,7 @@
 
 #### 1.1.1 Debug
 
-**注意**: `debug`仅在调试阶段开启, 生产环境请关闭(`iam_looger.setLevel(logging.ERROR)`);
+**注意**: `debug`仅在调试阶段开启, 生产环境请关闭(`iam_logger.setLevel(logging.ERROR)`);
 
 生产环境开启带来问题:
 
