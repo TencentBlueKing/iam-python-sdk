@@ -18,6 +18,11 @@ import requests
 
 logger = logging.getLogger("iam")
 
+session = requests.Session()
+adapter = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=20)
+session.mount("https://", adapter)
+session.mount("http://", adapter)
+
 
 def _gen_header():
     headers = {
@@ -39,7 +44,7 @@ def _http_request(
     resp = requests.Response()
     try:
         if method == "GET":
-            resp = requests.get(
+            resp = session.get(
                 url=url,
                 headers=headers,
                 params=data,
@@ -49,7 +54,7 @@ def _http_request(
                 cookies=cookies,
             )
         elif method == "HEAD":
-            resp = requests.head(
+            resp = session.head(
                 url=url,
                 headers=headers,
                 verify=verify,
@@ -58,7 +63,7 @@ def _http_request(
                 cookies=cookies,
             )
         elif method == "POST":
-            resp = requests.post(
+            resp = session.post(
                 url=url,
                 headers=headers,
                 json=data,
@@ -68,7 +73,7 @@ def _http_request(
                 cookies=cookies,
             )
         elif method == "DELETE":
-            resp = requests.delete(
+            resp = session.delete(
                 url=url,
                 headers=headers,
                 json=data,
@@ -78,7 +83,7 @@ def _http_request(
                 cookies=cookies,
             )
         elif method == "PUT":
-            resp = requests.put(
+            resp = session.put(
                 url=url,
                 headers=headers,
                 json=data,
