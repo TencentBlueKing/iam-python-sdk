@@ -23,7 +23,6 @@ from django.db.migrations.loader import MigrationLoader
 from django.template.engine import Context, Engine
 
 from iam.contrib.iam_migration import conf
-from iam.contrib.iam_migration.apps import IAMMigrationConfig
 from iam.contrib.iam_migration.template import migration_template
 
 
@@ -72,7 +71,7 @@ class Command(BaseCommand):
                     Context(
                         {
                             "migration_json": json_file,
-                            "app_label": IAMMigrationConfig.name,
+                            "app_label": conf.MIGRATION_APP_NAME,
                             "initial": is_initial,
                             "last_migration_name": last_migration_name,
                         }
