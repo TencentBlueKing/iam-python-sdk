@@ -156,7 +156,7 @@ class Client(object):
         ok, _data = http_func(url, data, headers=headers)
         # TODO: add debug here
         if not ok:
-            message = _data.get("error",  "verify from iam server fail")
+            message = _data.get("error", "verify from iam server fail")
             print("_call_iam_api fail.", "error:", message)
             return False, message, None
 
