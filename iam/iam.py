@@ -401,7 +401,9 @@ class IAM(object):
 
     # TODO: add the register model apis
     def get_token(self, system):
-        # bool, message, token
+        """ 获取token
+        return bool, message, token
+        """
         return self._client.get_token(system)
 
     def is_basic_auth_allowed(self, system, basic_auth):
