@@ -61,7 +61,7 @@ class Command(BaseCommand):
 
         migration_name = self.migration_name(last_migration_name)
         migration_file = "{}.py".format(
-            os.path.join(apps.get_app_config(conf.MIGRATION_APP_NAME).path, "migrations", migration_name)
+            os.path.join(apps.get_app_config(conf.MIGRATION_APP_NAME.split(".")[-1]).path, "migrations", migration_name)
         )
 
         with codecs.open(migration_file, mode="w", encoding="utf-8") as fp:
