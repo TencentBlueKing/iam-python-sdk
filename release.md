@@ -1,5 +1,9 @@
 版本日志
 ===============
+# v1.1.21
+
+- support django 3.2
+
 # v1.1.20
 
 - bugfix: 修复 iam sdk 拷贝到本地使用后执行 iam_makemigrations 报错的问题
