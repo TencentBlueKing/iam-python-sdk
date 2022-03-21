@@ -23,7 +23,6 @@ from django.db.migrations.loader import MigrationLoader
 from django.template.engine import Context, Engine
 
 from iam.contrib.iam_migration import conf
-from iam.contrib.iam_migration.apps import IAMMigrationConfig
 from iam.contrib.iam_migration.template import migration_template
 
 
@@ -62,7 +61,7 @@ class Command(BaseCommand):
 
         migration_name = self.migration_name(last_migration_name)
         migration_file = "{}.py".format(
-            os.path.join(apps.get_app_config(conf.MIGRATION_APP_NAME).path, "migrations", migration_name)
+            os.path.join(apps.get_app_config(conf.MIGRATION_APP_NAME.split(".")[-1]).path, "migrations", migration_name)
         )
 
         with codecs.open(migration_file, mode="w", encoding="utf-8") as fp:
@@ -72,7 +71,7 @@ class Command(BaseCommand):
                     Context(
                         {
                             "migration_json": json_file,
-                            "app_label": IAMMigrationConfig.name,
+                            "app_label": conf.MIGRATION_APP_NAME,
                             "initial": is_initial,
                             "last_migration_name": last_migration_name,
                         }
