@@ -45,7 +45,7 @@ class Client(object):
         self._app_code = app_code
         self._app_secret = app_secret
 
-        # enabled apigateay
+        # enabled apigateway
         self._apigateway_on = False
         if bk_apigateway_url:
             self._apigateway_on = True
@@ -59,14 +59,16 @@ class Client(object):
             self._bk_paas_host = bk_paas_host
 
         # will add ?debug=true in url, for debug api/policy, show the details
-        isApiDebugEnabled = os.environ.get("IAM_API_DEBUG") == "true" or os.environ.get("BKAPP_IAM_API_DEBUG") == "true"
+        is_api_debug_enabled = (os.environ.get("IAM_API_DEBUG") == "true"
+                                or os.environ.get("BKAPP_IAM_API_DEBUG") == "true")
         # will add ?force=true in url, for api/policy run without cache(all data from database)
-        isApiForceEnabled = os.environ.get("IAM_API_FORCE") == "true" or os.environ.get("BKAPP_IAM_API_FORCE") == "true"
+        is_api_force_enabled = (os.environ.get("IAM_API_FORCE") == "true"
+                                or os.environ.get("BKAPP_IAM_API_FORCE") == "true")
 
         self._extra_url_params = {}
-        if isApiDebugEnabled:
+        if is_api_debug_enabled:
             self._extra_url_params["debug"] = "true"
-        if isApiForceEnabled:
+        if is_api_force_enabled:
             self._extra_url_params["force"] = "true"
 
     def _call_api(self, http_func, host, path, data, headers, timeout=None):
@@ -88,13 +90,12 @@ class Client(object):
             logger.debug("http request took %s ms", int((time.time() - begin) * 1000))
 
         if not ok:
-            return False, message or "verify from iam server fail", None
+            return False, message or "request to iam server fail", None
 
         if _data.get("code") != 0:
             return False, _data.get("message") or "iam api fail", None
 
         _d = _data.get("data")
-
         return True, "ok", _d
 
     def _call_apigateway_api(self, http_func, path, data, timeout=None):
@@ -168,7 +169,7 @@ class Client(object):
         return ok, message
 
     def update_resource_type(self, system_id, resource_type_id, data):
-        path = ("/api/v1/model/systems/{system_id}/resource-types/{resource_type_id}").format(
+        path = "/api/v1/model/systems/{system_id}/resource-types/{resource_type_id}".format(
             system_id=system_id, resource_type_id=resource_type_id
         )
 

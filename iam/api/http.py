@@ -108,13 +108,13 @@ def _http_request(
         message_format = (
             "request: [method=`%s`, url=`%s`, data=`%s`] response: [status_code=`%s`, request_id=`%s`, content=`%s`]"
         )
+        message = message_format % (method, url, str(data), resp.status_code, request_id, content)
 
         if resp.status_code != 200:
-            message = message_format % (method, url, str(data), resp.status_code, request_id, content)
             logger.error(message)
             return False, message, None
 
-        logger.info(message_format % (method, url, str(data), resp.status_code, request_id, content))
+        logger.info(message)
         return True, "ok", resp.json()
     finally:
         if resp.request is None:

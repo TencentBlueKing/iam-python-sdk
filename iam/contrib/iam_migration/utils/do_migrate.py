@@ -84,10 +84,10 @@ def _http_request(method, url, headers=None, data=None, timeout=None, verify=Fal
                 url=url, headers=headers, json=data, timeout=timeout, verify=verify, cert=cert, cookies=cookies
             )
         else:
-            return False, None
+            return False, {"error": "method not supported"}
     except requests.exceptions.RequestException as e:
         print("http request error! method: %s, url: %s, data: %s! err=%s", method, url, data, e)
-        return False, None
+        return False, {"error": str(e)}
     else:
         if resp.status_code != 200:
             content = resp.content[:100] if resp.content else ""
@@ -95,7 +95,7 @@ def _http_request(method, url, headers=None, data=None, timeout=None, verify=Fal
                 "http request fail! method: %s, url: %s, data: %s, " "response_status_code: %s, response_content: %s"
             )
             print(error_msg % (method, url, str(data), resp.status_code, content))
-            return False, None
+            return False, {"error": "status_code is %d, not 200" % resp.status_code}
 
         return True, resp.json()
 
@@ -156,7 +156,7 @@ class Client(object):
         ok, _data = http_func(url, data, headers=headers)
         # TODO: add debug here
         if not ok:
-            message = "verify from iam server fail"
+            message = _data.get("error", "verify from iam server fail")
             print("_call_iam_api fail.", "error:", message)
             return False, message, None
 
