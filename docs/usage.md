@@ -534,6 +534,15 @@ Resource API Framework 中有两个核心概念：
     - `options`：
       - `language`：国际化语言
   - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM list_instance_by_policy 响应协议
+6. `search_instance(filter, page, **options)`：处理来自 IAM 的 search_instance 请求
+  - 参数：
+    - `filter`：过滤器对象
+      - `filter.keyword(str)`：资源实例的搜索关键字
+      - `filter.parent(dict)`：资源的直接上级，具体包含type和id，type为直接上级资源的类型，id为直接上级资源实例ID
+    - `page`：分页对象
+      - `page.limit(int)`：查询数量
+      - `page.offset(int)`：查询偏移
+  - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM search_instance 响应协议
 
 除此之外，如果 Provider 中定义了 `pre_{method}` 方法（`method` 可选值（`list_attr`, `list_attr_value`, `list_instance`, `fetch_instance_info`, `list_instance_by_policy`），Dispatcher 会在调用对应的 `{method}` 方法前调用其对应的 `pre` 方法进行预处理，下面的例子检测 `list_instance` 中传入的 page 对象，如果 limit 过大，则拒绝该请求：
 
@@ -549,27 +558,61 @@ class TaskResourceProvider(ResourceProvider):
 
 ```python
 from iam.resource.provider import ResourceProvider, ListResult
+from task.models import Tasks
 
-class ProjectResourceProvider(ResourceProvider):
-    def list_attr(self, **options):
-        results = get_project_list_attr()
-        return ListResult(results=results)
 
-    def list_attr_value(self, filter, page, **options):
-        results = get_project_list_attr_value()
-        return ListResult(results=results)
-
+class TaskResourceProvider(ResourceProvider):
     def list_instance(self, filter, page, **options):
-        results = get_project_instance()
-        return ListResult(results=results)
+        """配置权限时的下拉列表
+        注意, 有翻页; 需要返回count
+        """
+        queryset = Tasks.objects.all()
+        count = queryset.count()
+        results = [
+            {"id": str(task.id), "display_name": task.name} for task in queryset[page.slice_from : page.slice_to]
+        ]
+
+        return ListResult(results=results, count=count)
+
+    def search_instance(self, filter, page, **options):
+        """配置权限时的搜索框
+        注意, 有翻页; 需要返回count
+        """
+        queryset = Tasks.objects.filter(name__contains=filter.keyword).all()
+        count = queryset.count()
+        results = [
+            {"id": str(task.id), "display_name": task.name} for task in queryset[page.slice_from : page.slice_to]
+        ]
+        return ListResult(results=results, count=count)
 
     def fetch_instance_info(self, filter, **options):
-        results = get_project_instance_detail()
+        """申请权限时, 回调这个接口进行资源信息正确性/合法性校验
+        """
+        ids = []
+        if filter.ids:
+            ids = [int(i) for i in filter.ids]
+
+        results = [{"id": str(task.id), "display_name": task.task_name} for task in Tasks.objects.filter(id__in=ids)]
         return ListResult(results=results)
 
+    def list_attr(self, **options):
+        """通过属性配置权限会用到, 没有属性权限管控不需要实现
+        属性列表
+        """
+        return ListResult(results=[])
+
+    def list_attr_value(self, filter, page, **options):
+        """通过属性配置权限会用到, 没有属性权限管控不需要实现
+        属性值列表
+        注意, 有翻页; 需要返回count
+        """
+        return ListResult(results=[], count=0)
+
     def list_instance_by_policy(self, filter, page, **options):
-        results = get_project_instance_by_policy()
-        return ListResult(results=results)
+        """权限预览, 暂时没有用到, 可以不实现
+        注意, 有翻页; 需要返回count
+        """
+        return ListResult(results=[], count=0)
 ```
 
 ### 3.2 Dispatcher
@@ -715,6 +758,9 @@ class FlowResourceProvider(ResourceProvider):
 
         return ListResult(results=results)
 
+    def search_instance(self, filter, page, **options):
+        # TODO
+        return ListResult(results=[], count=0)
 
 dispatcher = DjangoBasicResourceApiDispatcher(iam, "my_system")
 dispatcher.register("flow", FlowResourceProvider())
