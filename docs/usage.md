@@ -22,9 +22,9 @@ import logging
 iam_logger = logging.getLogger("iam")
 iam_logger.setLevel(logging.DEBUG)
 
-debug_hanler = logging.StreamHandler(sys.stdout)
-debug_hanler.setFormatter(logging.Formatter('%(levelname)s [%(asctime)s] [IAM] %(message)s'))
-iam_logger.addHandler(debug_hanler)
+debug_handler = logging.StreamHandler(sys.stdout)
+debug_handler.setFormatter(logging.Formatter('%(levelname)s [%(asctime)s] [IAM] %(message)s'))
+iam_logger.addHandler(debug_handler)
 ```
 
 在调用sdk进行鉴权时, 会在终端打印debug日志
@@ -587,19 +587,20 @@ class TaskResourceProvider(ResourceProvider):
 
     def fetch_instance_info(self, filter, **options):
         """申请权限时, 回调这个接口进行资源信息正确性/合法性校验
+        无需count, 但是目前ListResult初始化这个参数暂时是必选的(FIXME)
         """
         ids = []
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
         results = [{"id": str(task.id), "display_name": task.task_name} for task in Tasks.objects.filter(id__in=ids)]
-        return ListResult(results=results)
+        return ListResult(results=results, count=0)
 
     def list_attr(self, **options):
         """通过属性配置权限会用到, 没有属性权限管控不需要实现
         属性列表
         """
-        return ListResult(results=[])
+        return ListResult(results=[], count=0)
 
     def list_attr_value(self, filter, page, **options):
         """通过属性配置权限会用到, 没有属性权限管控不需要实现
@@ -666,13 +667,13 @@ class FlowResourceProvider(ResourceProvider):
         """
         flow 资源没有属性，返回空
         """
-        return ListResult(results=[])
+        return ListResult(results=[], count=0)
 
     def list_attr_value(self, filter, page, **options):
         """
         flow 资源没有属性，返回空
         """
-        return ListResult(results=[])
+        return ListResult(results=[], count=0)
 
     def list_instance(self, filter, page, **options):
         """
@@ -720,7 +721,7 @@ class FlowResourceProvider(ResourceProvider):
                 for flow in queryset[page.slice_from : page.slice_to]
             ]
 
-        return ListResult(results=results)
+        return ListResult(results=results, count=len(results))
 
     def fetch_instance_info(self, filter, **options):
         """
@@ -731,7 +732,7 @@ class FlowResourceProvider(ResourceProvider):
             ids = [int(i) for i in filter.ids]
 
         results = [{"id": str(flow.id), "display_name": flow.name} for flow in TaskTemplate.objects.filter(id__in=ids)]
-        return ListResult(results=results)
+        return ListResult(results=results, count=0)
 
     def list_instance_by_policy(self, filter, page, **options):
         """
@@ -756,7 +757,7 @@ class FlowResourceProvider(ResourceProvider):
             for flow in TaskTemplate.objects.filter(filters)[page.slice_from : page.slice_to]
         ]
 
-        return ListResult(results=results)
+        return ListResult(results=results, count=len(results))
 
     def search_instance(self, filter, page, **options):
         # TODO

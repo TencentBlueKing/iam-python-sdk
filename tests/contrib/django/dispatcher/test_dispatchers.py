@@ -137,12 +137,12 @@ def test_basic_resource_api_dispatcher__dispatch__basic_params_error():
 
 
 @patch("iam.contrib.django.dispatcher.dispatchers.JsonResponse", dict)
-def test_basic_resource_api_dispatcher__dispatch__unsupport_type():
+def test_basic_resource_api_dispatcher__dispatch__unsupported_type():
     iam = MagicMock()
     iam.is_basic_auth_allowed = MagicMock(return_value=True)
 
     req = MagicMock()
-    req.body = json.dumps({"method": "list_attr", "type": "unsupport_type"})
+    req.body = json.dumps({"method": "list_attr", "type": "unsupported_type"})
 
     dispatcher = DjangoBasicResourceApiDispatcher(iam, "system")
 
@@ -151,17 +151,17 @@ def test_basic_resource_api_dispatcher__dispatch__unsupport_type():
     assert resp["code"] == 404
     assert resp["result"] is False
     assert resp["data"] is None
-    assert resp["message"] == "unsupport resource type: unsupport_type"
+    assert resp["message"] == "unsupported resource type: unsupported_type"
     assert "X-Request-Id" in resp
 
 
 @patch("iam.contrib.django.dispatcher.dispatchers.JsonResponse", dict)
-def test_basic_resource_api_dispatcher__dispatch__unsupport_method():
+def test_basic_resource_api_dispatcher__dispatch__unsupported_method():
     iam = MagicMock()
     iam.is_basic_auth_allowed = MagicMock(return_value=True)
 
     req = MagicMock()
-    req.body = json.dumps({"method": "unsupport_method", "type": "type"})
+    req.body = json.dumps({"method": "unsupported_method", "type": "type"})
 
     dispatcher = DjangoBasicResourceApiDispatcher(iam, "system")
     dispatcher._provider["type"] = "provider"
@@ -171,7 +171,7 @@ def test_basic_resource_api_dispatcher__dispatch__unsupport_method():
     assert resp["code"] == 404
     assert resp["result"] is False
     assert resp["data"] is None
-    assert resp["message"] == "unsupport method: unsupport_method"
+    assert resp["message"] == "unsupported method: unsupported_method"
     assert "X-Request-Id" in resp
 
 
