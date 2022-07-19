@@ -16,6 +16,7 @@ from collections import OrderedDict
 from . import meta
 
 
+# flake8: noqa: C901
 def gen_perms_apply_data(system, subject, action_to_resources_list):
     """
     根据传入的参数生成无权限交互协议数据
