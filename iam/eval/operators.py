@@ -111,7 +111,7 @@ class BinaryOperator(Operator):
     def calculate(self, left, right):
         pass
 
-    def _eval_positive(self, object_attr, is_object_attr_array, policy_value, is_policy_value_array):  # NOQA
+    def _eval_positive(self, object_attr, is_object_attr_array, policy_value):  # NOQA
         """
         positive:
         - 1   hit: return True
@@ -121,59 +121,22 @@ class BinaryOperator(Operator):
         op = eq => one of attr equals one of value
 
         attr = 1; value = 1; True
-        attr = 1; value = [1, 2]; True
         attr = [1, 2]; value = 2; True
-        attr = [1, 2]; value = [5, 1]; True
-
-        attr = [1, 2]; value = [3, 4]; False
         """
-        if self.op == OP.ANY:
-            return self.calculate(object_attr, policy_value)
+        # if self.op == OP.ANY:
+        #     return self.calculate(object_attr, policy_value)
 
-        # 1. IN/NOT_IN policy_value is a list(checked in eval), just only check attr
-        if self.op in (OP.IN,):
-            if is_object_attr_array:
-                for a in object_attr:
-                    if self.calculate(a, policy_value):
-                        return True
-                return False
-
-            return self.calculate(object_attr, policy_value)
-
-        # 2. CONTAINS/NOT_CONTAINS attr is a list, and policy_value will be a single value(checked in eval)
-        if self.op in (OP.CONTAINS,):
-            return self.calculate(object_attr, policy_value)
-
-        # 3. Others, check both attr and value
-        # 3.1 both not array, the most common situation
-        if not (is_policy_value_array or is_object_attr_array):
-            return self.calculate(object_attr, policy_value)
-
-        # 3.2 only value is array, the second common situation
-        if is_policy_value_array and (not is_object_attr_array):
-            for v in policy_value:
-                # return early if hit
-                if self.calculate(object_attr, v):
-                    return True
-            return False
-
-        # 3.3 only attr value is array
-        if (not is_policy_value_array) and is_object_attr_array:
+        # NOTE: here, the policyValue should not be array!
+        # It's single value (except: the NotIn op policyValue is an array)
+        if is_object_attr_array:
             for a in object_attr:
-                # return early if hit
                 if self.calculate(a, policy_value):
                     return True
             return False
 
-        # 4. both array
-        for a in object_attr:
-            for v in policy_value:
-                # return early if hit
-                if self.calculate(a, v):
-                    return True
-        return False
+        return self.calculate(object_attr, policy_value)
 
-    def _eval_negative(self, object_attr, is_object_attr_array, policy_value, is_policy_value_array):  # NOQA
+    def _eval_negative(self, object_attr, is_object_attr_array, policy_value):  # NOQA
         """
         negative:
         - 1   miss: return False
@@ -183,52 +146,18 @@ class BinaryOperator(Operator):
         op = not_eq => all of attr should not_eq to all of the value
 
         attr = 1; value = 2; True
-        attr = 1; value = [2]; True
-        attr = [1, 2]; value = [3, 4]; True
         attr = [1, 2]; value = 3; True
-
-        attr = [1, 2]; value = [2, 3]; False
         """
-        # 1. IN/NOT_IN policy_value is a list(checked in eval), just only check attr
-        if self.op in (OP.NOT_IN,):
-            if is_object_attr_array:
-                for a in object_attr:
-                    if not self.calculate(a, policy_value):
-                        return False
-                return True
 
-            return self.calculate(object_attr, policy_value)
-
-        # 2. CONTAINS/NOT_CONTAINS attr is a list, and policy_value will be a single value(checked in eval)
-        if self.op in (OP.NOT_CONTAINS,):
-            return self.calculate(object_attr, policy_value)
-
-        # 3. Others, check both attr and value
-        # 3.1 both not array, the most common situation
-        if not (is_policy_value_array or is_object_attr_array):
-            return self.calculate(object_attr, policy_value)
-
-        # 3.2 only value is array, the second common situation
-        if is_policy_value_array and (not is_object_attr_array):
-            for v in policy_value:
-                if not self.calculate(object_attr, v):
-                    return False
-            return True
-
-        # 3.3 only attr value is array
-        if (not is_policy_value_array) and is_object_attr_array:
+        # NOTE: here, the policyValue should not be array!
+        # It's single value (except: the NotIn op policyValue is an array)
+        if is_object_attr_array:
             for a in object_attr:
                 if not self.calculate(a, policy_value):
                     return False
             return True
 
-        # 4. both array
-        for a in object_attr:
-            for v in policy_value:
-                # return early if hit
-                if not self.calculate(a, v):
-                    return False
-        return True
+        return self.calculate(object_attr, policy_value)
 
     def eval(self, obj_set):
         """
@@ -245,6 +174,10 @@ class BinaryOperator(Operator):
         is_object_attr_array = isinstance(object_attr, (list, tuple))
         is_policy_value_array = isinstance(policy_value, (list, tuple))
 
+        # any
+        if self.op == OP.ANY:
+            return True
+
         # if you add new operator, please read this first: https://github.com/TencentBlueKing/bk-iam-saas/issues/1293
         # valid the attr and value first
         if self.op in (OP.IN, OP.NOT_IN):
@@ -254,6 +187,11 @@ class BinaryOperator(Operator):
             if not is_policy_value_array:
                 return False
 
+            if self.op == OP.IN:
+                return self._eval_positive(object_attr, is_object_attr_array, policy_value)
+            else:
+                return self._eval_negative(object_attr, is_object_attr_array, policy_value)
+
         if self.op in (OP.CONTAINS, OP.NOT_CONTAINS):
             # a contains b,  a not_contains b
             # a should be an array, b should be a single value
@@ -261,6 +199,7 @@ class BinaryOperator(Operator):
             # while a can be a single value or an array
             if not is_object_attr_array or is_policy_value_array:
                 return False
+            return self.calculate(object_attr, policy_value)
 
         if self.op in (
             OP.EQ,
@@ -280,13 +219,13 @@ class BinaryOperator(Operator):
             if is_policy_value_array:
                 return False
 
-        # positive and negative operator
-        # ==  命中一个即返回
-        # !=  需要全部遍历完, 确认全部不等于才返回?
-        if self.op.startswith("not_"):
-            return self._eval_negative(object_attr, is_object_attr_array, policy_value, is_policy_value_array)
-        else:
-            return self._eval_positive(object_attr, is_object_attr_array, policy_value, is_policy_value_array)
+            # positive and negative operator
+            # ==  命中一个即返回
+            # !=  需要全部遍历完, 确认全部不等于才返回?
+            if self.op.startswith("not_"):
+                return self._eval_negative(object_attr, is_object_attr_array, policy_value)
+            else:
+                return self._eval_positive(object_attr, is_object_attr_array, policy_value)
 
 
 class EqualOperator(BinaryOperator):
