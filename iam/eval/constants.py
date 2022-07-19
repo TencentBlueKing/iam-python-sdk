@@ -34,6 +34,8 @@ class OP(object):
     ENDS_WITH = "ends_with"
     NOT_ENDS_WITH = "not_ends_with"
 
+    STRING_CONTAINS = "string_contains"
+
     LT = "lt"
     LTE = "lte"
     GT = "gt"
@@ -47,12 +49,13 @@ class OP(object):
             NOT_EQ,
             IN,
             NOT_IN,
-            CONTAINS,
-            NOT_CONTAINS,
+            # CONTAINS,
+            # NOT_CONTAINS,
             STARTS_WITH,
             NOT_STARTS_WITH,
             ENDS_WITH,
             NOT_ENDS_WITH,
+            STRING_CONTAINS,
             ANY,
         ],
         "numberic": [EQ, NOT_EQ, IN, NOT_IN, LT, LTE, GT, GTE],

@@ -10,7 +10,6 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 import pytest
-
 from iam import SQLConverter
 
 
@@ -102,6 +101,14 @@ def test_not_ends_with():
     assert c._not_ends_with("id", "test") == "id NOT LIKE '%test'"
     assert c._not_ends_with("id", ["test", "test1"]) == "(id NOT LIKE '%test' AND id NOT LIKE '%test1')"
     assert c._not_ends_with("id", ["test", 123]) == "(id NOT LIKE '%test' AND id NOT LIKE '%123')"
+
+
+def test_string_contains():
+    c = SQLConverter()
+
+    assert c._string_contains("id", "test") == "id LIKE '%test%'"
+    assert c._string_contains("id", ["test", "test1"]) == "(id LIKE '%test%' OR id LIKE '%test1%')"
+    assert c._string_contains("id", ["test", 123]) == "(id LIKE '%test%' OR id LIKE '%123%')"
 
 
 def test_lt():

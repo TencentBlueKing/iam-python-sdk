@@ -12,7 +12,6 @@ specific language governing permissions and limitations under the License.
 
 
 import six
-
 from iam.eval.constants import OP
 from iam.eval.expression import field_value_convert
 
@@ -75,12 +74,12 @@ class SQLConverter(Converter):
         return self._negative("{} != {}", left, right)
 
     def _in(self, left, right):
-        # TODO: right shuld be a list
+        # TODO: right should be a list
         right = [self._to_str_present(r, True) for r in right]
         return "{} IN ({})".format(left, ",".join([str(r) for r in right]))
 
     def _not_in(self, left, right):
-        # TODO: right shuld be a list
+        # TODO: right should be a list
         right = [self._to_str_present(r, True) for r in right]
         return "{} NOT IN ({})".format(left, ",".join([str(r) for r in right]))
 
@@ -102,6 +101,9 @@ class SQLConverter(Converter):
 
     def _not_ends_with(self, left, right):
         return self._negative("{} NOT LIKE '%{}'", left, right, False)
+
+    def _string_contains(self, left, right):
+        return self._positive("{} LIKE '%{}%'", left, right, False)
 
     def _lt(self, left, right):
         return self._positive("{} < {}", left, right)
@@ -145,6 +147,7 @@ class SQLConverter(Converter):
             OP.NOT_STARTS_WITH: self._not_starts_with,
             OP.ENDS_WITH: self._ends_with,
             OP.NOT_ENDS_WITH: self._not_ends_with,
+            OP.STRING_CONTAINS: self._string_contains,
             OP.LT: self._lt,
             OP.LTE: self._lte,
             OP.GT: self._gt,

@@ -35,6 +35,9 @@ def test_gen_perms_apply_data():
     resource4 = Resource("another_system", "r4", "r4id", {"name": "r4n"})
     resource5 = Resource("another_system", "r4", "r5id", {"name": "r5n"})
     resource6 = Resource("test_system", "r6", "r6id", {"name": "r6n", "_bk_iam_path_": "/biz,1/set,2/module,3/"})
+    resource7 = Resource(
+        "test_system", "r7", "r7id", {"name": "r7n", "_bk_iam_path_": "/bk_cmdb,biz,1/bk_cmdb,set,2/bk_cmdb,module,3/"}
+    )
 
     def get_system_name(system):
         return {"test_system": "test_system_name", "another_system": "another_system_name"}[system]
@@ -56,6 +59,7 @@ def test_gen_perms_apply_data():
                 "r2": "r2_type",
                 "r3": "r3_type",
                 "r6": "r6_type",
+                "r7": "r7_type",
                 "biz": "biz_type",
                 "set": "set_type",
                 "module": "module_type",
@@ -81,6 +85,7 @@ def test_gen_perms_apply_data():
                             ],
                         },
                         {"action": action4, "resources_list": [[resource6]]},
+                        {"action": action4, "resources_list": [[resource7]]},
                     ],
                 )
 
@@ -161,6 +166,26 @@ def test_gen_perms_apply_data():
                                 {"type": "set", "type_name": "set_type", "id": "2", "name": "set,2"},
                                 {"type": "module", "type_name": "module_type", "id": "3", "name": "module,3"},
                                 {"type": "r6", "type_name": "r6_type", "id": "r6id", "name": "r6n"},
+                            ]
+                        ],
+                    }
+                ],
+            },
+            {
+                "id": "action4",
+                "name": "action4_name",
+                "related_resource_types": [
+                    {
+                        "system_id": "test_system",
+                        "system_name": "test_system_name",
+                        "type": "r7",
+                        "type_name": "r7_type",
+                        "instances": [
+                            [
+                                {"type": "biz", "type_name": "biz_type", "id": "1", "name": "biz,1"},
+                                {"type": "set", "type_name": "set_type", "id": "2", "name": "set,2"},
+                                {"type": "module", "type_name": "module_type", "id": "3", "name": "module,3"},
+                                {"type": "r7", "type_name": "r7_type", "id": "r7id", "name": "r7n"},
                             ]
                         ],
                     }

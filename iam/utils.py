@@ -82,7 +82,17 @@ def gen_perms_apply_data(system, subject, action_to_resources_list):
 
                     if topo_path:
                         for part in topo_path[1:-1].split("/"):
-                            rtype, rid = part.split(",")
+                            node_parts = part.split(",")
+                            rtype, rid = "", ""
+                            if len(node_parts) == 2:
+                                rtype, rid = node_parts[0], node_parts[1]
+                            elif len(node_parts) == 3:
+                                rtype, rid = node_parts[1], node_parts[2]
+                                # NOTE: currently, keep the name of /bk_cmdb,set,1/ same as /set,1/
+                                part = ",".join(node_parts[1:])
+                            else:
+                                raise Exception("Invalid _bk_iam_path_: %s" % topo_path)
+
                             inst_item.append(
                                 {
                                     "type": rtype,
