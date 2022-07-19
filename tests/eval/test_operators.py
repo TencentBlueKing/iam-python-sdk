@@ -412,15 +412,14 @@ def test_math_operator():
     assert gte.eval(d2)
     assert gte.eval(d3)
 
-    # GTE, policy list is an array
+    # GTE, policy list is an array, will all get False
     gte = GTEOperator("person.age", [21, 20])
 
     assert gte.op == OP.GTE
     assert gte.expr() == "(person.age gte [21, 20])"
-
     assert not gte.eval(d1)
-    assert gte.eval(d2)
-    assert gte.eval(d3)
+    assert not gte.eval(d2)
+    assert not gte.eval(d3)
 
 
 def test_any_operator():
@@ -471,17 +470,13 @@ def test_binary_operator_eval_positive():
     eq1 = EqualOperator("host.id", 1)
     assert eq1.eval(d1)
 
-    eq2 = EqualOperator("host.id", [1, 2])
-    assert eq2.eval(d1)
-
     eq3 = EqualOperator("host.id", 2)
     assert eq3.eval(d2)
 
-    eq4 = EqualOperator("host.id", [5, 1])
-    assert eq4.eval(d2)
-
-    eq5 = EqualOperator("host.id", [3, 4])
-    assert not eq5.eval(d2)
+    # if policyValue is an array, always got false
+    assert not EqualOperator("host.id", [1, 2]).eval(d1)
+    assert not EqualOperator("host.id", [5, 1]).eval(d2)
+    assert not EqualOperator("host.id", [3, 4]).eval(d2)
 
     # IN
     d3 = ObjectSet()
@@ -527,17 +522,13 @@ def test_binary_operator_eval_negative():
     neq1 = NotEqualOperator("host.id", 2)
     assert neq1.eval(d1)
 
-    neq2 = NotEqualOperator("host.id", [2])
-    assert neq2.eval(d1)
-
-    neq3 = NotEqualOperator("host.id", [3, 4])
-    assert neq3.eval(d2)
-
     neq4 = NotEqualOperator("host.id", 3)
     assert neq4.eval(d2)
 
-    neq5 = NotEqualOperator("host.id", [2, 3])
-    assert not neq5.eval(d2)
+    # not_eq policy value is an array, always False
+    assert not NotEqualOperator("host.id", [2]).eval(d1)
+    assert not NotEqualOperator("host.id", [3, 4]).eval(d2)
+    assert not NotEqualOperator("host.id", [2, 3]).eval(d2)
 
     # NOT_IN
     d3 = ObjectSet()

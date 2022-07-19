@@ -262,7 +262,19 @@ class BinaryOperator(Operator):
             if not is_object_attr_array or is_policy_value_array:
                 return False
 
-        if self.op in (OP.STARTS_WITH, OP.ENDS_WITH, OP.NOT_STARTS_WITH, OP.NOT_ENDS_WITH, OP.STRING_CONTAINS):
+        if self.op in (
+            OP.EQ,
+            OP.NOT_EQ,
+            OP.LT,
+            OP.LTE,
+            OP.GT,
+            OP.GTE,
+            OP.STARTS_WITH,
+            OP.NOT_STARTS_WITH,
+            OP.ENDS_WITH,
+            OP.NOT_ENDS_WITH,
+            OP.STRING_CONTAINS,
+        ):
             # a starts_with b, a not_starts_with, a ends_with b, a not_ends_with b
             # b should be a single value, while a can be a single value or an array
             if is_policy_value_array:
