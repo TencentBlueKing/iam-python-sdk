@@ -70,11 +70,18 @@ def test_parse_bk_iam_path():
 
     assert "/biz,1/set," == _parse_bk_iam_path("/biz,1/set,*/")
 
+    assert "/bk_cmdb,biz,1/bk_cmdb,set,1/" == _parse_bk_iam_path("/bk_cmdb,biz,1/bk_cmdb,set,1/")
+    assert "/bk_cmdb,biz,1/bk_cmdb,set," == _parse_bk_iam_path("/bk_cmdb,biz,1/bk_cmdb,set,*/")
+
     # tuple
     assert ["a", "b"] == _parse_bk_iam_path(("a", "b"))
 
     # tuple path
     assert ["/biz,1/set,1/", "/biz,2/module,"] == _parse_bk_iam_path(("/biz,1/set,1/", "/biz,2/module,*/"))
+
+    assert ["/bk_cmdb,biz,1/bk_cmdb,set,1/", "/bk_cmdb,biz,2/bk_cmdb,module,"] == _parse_bk_iam_path(
+        ("/bk_cmdb,biz,1/bk_cmdb,set,1/", "/bk_cmdb,biz,2/bk_cmdb,module,*/")
+    )
 
     # int
     assert 1 == _parse_bk_iam_path(1)

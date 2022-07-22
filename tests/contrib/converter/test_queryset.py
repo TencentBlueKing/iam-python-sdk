@@ -11,7 +11,6 @@ specific language governing permissions and limitations under the License.
 """
 
 from django.db.models import Q
-
 from iam import DjangoQuerySetConverter
 
 
@@ -103,6 +102,14 @@ def test_not_ends_with():
     assertQEqual(c._not_ends_with("id", ["test", "test1"]), (~Q(id__endswith="test") & ~Q(id__endswith="test1")))
 
     assertQEqual(c._not_ends_with("id", ["test", 123]), (~Q(id__endswith="test") & ~Q(id__endswith=123)))
+
+
+def test_string_contains():
+    c = DjangoQuerySetConverter()
+
+    assertQEqual(c._string_contains("id", "1"), Q(id__contains="1"))
+    assertQEqual(c._string_contains("id", 1), Q(id__contains=1))
+    assertQEqual(c._string_contains("id", ["1", 1]), (Q(id__contains="1") | Q(id__contains=1)))
 
 
 def test_lt():

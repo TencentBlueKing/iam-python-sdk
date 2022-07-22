@@ -12,12 +12,11 @@ specific language governing permissions and limitations under the License.
 
 
 import operator
-from six.moves import reduce
 
 from django.db.models import Q
-
 from iam.eval.constants import KEYWORD_BK_IAM_PATH_FIELD_SUFFIX, OP
 from iam.eval.expression import field_value_convert
+from six.moves import reduce
 
 from .base import Converter
 
@@ -84,6 +83,9 @@ class DjangoQuerySetConverter(Converter):
     def _not_ends_with(self, left, right):
         return self._negative("{}__endswith", left, right)
 
+    def _string_contains(self, left, right):
+        return self._positive("{}__contains", left, right)
+
     def _lt(self, left, right):
         return self._positive("{}__lt", left, right)
 
@@ -139,6 +141,7 @@ class DjangoQuerySetConverter(Converter):
                 OP.NOT_STARTS_WITH: self._not_starts_with,
                 OP.ENDS_WITH: self._ends_with,
                 OP.NOT_ENDS_WITH: self._not_ends_with,
+                OP.STRING_CONTAINS: self._string_contains,
                 OP.LT: self._lt,
                 OP.LTE: self._lte,
                 OP.GT: self._gt,
