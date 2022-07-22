@@ -111,7 +111,7 @@ class BinaryOperator(Operator):
     def calculate(self, left, right):
         pass
 
-    def _eval_positive(self, attr, attr_is_array, value, value_is_array):  # NOQA
+    def _eval_positive(self, object_attr, is_object_attr_array, policy_value):  # NOQA
         """
         positive:
         - 1   hit: return True
@@ -121,65 +121,22 @@ class BinaryOperator(Operator):
         op = eq => one of attr equals one of value
 
         attr = 1; value = 1; True
-        attr = 1; value = [1, 2]; True
         attr = [1, 2]; value = 2; True
-        attr = [1, 2]; value = [5, 1]; True
-
-        attr = [1, 2]; value = [3, 4]; False
         """
-        if self.op == OP.ANY:
-            return self.calculate(attr, value)
+        # if self.op == OP.ANY:
+        #     return self.calculate(object_attr, policy_value)
 
-        # 1. IN/NOT_IN value is a list, just only check attr
-        if self.op in (OP.IN,):
-            if attr_is_array:
-                for a in attr:
-                    if self.calculate(a, value):
-                        return True
-                return False
-
-            return self.calculate(attr, value)
-
-        # 2. CONTAINS/NOT_CONTAINS attr is a list, just check value
-        if self.op in (OP.CONTAINS,):
-            if value_is_array:
-                for v in value:
-                    if self.calculate(attr, v):
-                        return True
-                return False
-
-            return self.calculate(attr, value)
-
-        # 3. Others, check both attr and value
-        # 3.1 both not array, the most common situation
-        if not (value_is_array or attr_is_array):
-            return self.calculate(attr, value)
-
-        # 3.2 only value is array, the second common situation
-        if value_is_array and (not attr_is_array):
-            for v in value:
-                # return early if hit
-                if self.calculate(attr, v):
+        # NOTE: here, the policyValue should not be array!
+        # It's single value (except: the NotIn op policyValue is an array)
+        if is_object_attr_array:
+            for a in object_attr:
+                if self.calculate(a, policy_value):
                     return True
             return False
 
-        # 3.3 only attr value is array
-        if (not value_is_array) and attr_is_array:
-            for a in attr:
-                # return early if hit
-                if self.calculate(a, value):
-                    return True
-            return False
+        return self.calculate(object_attr, policy_value)
 
-        # 4. both array
-        for a in attr:
-            for v in value:
-                # return early if hit
-                if self.calculate(a, v):
-                    return True
-        return False
-
-    def _eval_negative(self, attr, attr_is_array, value, value_is_array):  # NOQA
+    def _eval_negative(self, object_attr, is_object_attr_array, policy_value):  # NOQA
         """
         negative:
         - 1   miss: return False
@@ -189,58 +146,18 @@ class BinaryOperator(Operator):
         op = not_eq => all of attr should not_eq to all of the value
 
         attr = 1; value = 2; True
-        attr = 1; value = [2]; True
-        attr = [1, 2]; value = [3, 4]; True
         attr = [1, 2]; value = 3; True
-
-        attr = [1, 2]; value = [2, 3]; False
         """
-        # 1. IN/NOT_IN value is a list, just only check attr
-        if self.op in (OP.NOT_IN,):
-            if attr_is_array:
-                for a in attr:
-                    if not self.calculate(a, value):
-                        return False
-                return True
 
-            return self.calculate(attr, value)
-
-        # 2. CONTAINS/NOT_CONTAINS attr is a list, just check value
-        if self.op in (OP.NOT_CONTAINS,):
-            if value_is_array:
-                for v in value:
-                    if not self.calculate(attr, v):
-                        return False
-                return True
-
-            return self.calculate(attr, value)
-
-        # 3. Others, check both attr and value
-        # 3.1 both not array, the most common situation
-        if not (value_is_array or attr_is_array):
-            return self.calculate(attr, value)
-
-        # 3.2 only value is array, the second common situation
-        if value_is_array and (not attr_is_array):
-            for v in value:
-                if not self.calculate(attr, v):
+        # NOTE: here, the policyValue should not be array!
+        # It's single value (except: the NotIn op policyValue is an array)
+        if is_object_attr_array:
+            for a in object_attr:
+                if not self.calculate(a, policy_value):
                     return False
             return True
 
-        # 3.3 only attr value is array
-        if (not value_is_array) and attr_is_array:
-            for a in attr:
-                if not self.calculate(a, value):
-                    return False
-            return True
-
-        # 4. both array
-        for a in attr:
-            for v in value:
-                # return early if hit
-                if not self.calculate(a, v):
-                    return False
-        return True
+        return self.calculate(object_attr, policy_value)
 
     def eval(self, obj_set):
         """
@@ -251,19 +168,64 @@ class BinaryOperator(Operator):
         if one of them is array, or both array
         calculate each item in array
         """
-        attr = obj_set.get(self.field)
-        value = self.value
+        object_attr = obj_set.get(self.field)
+        policy_value = self.value
 
-        attr_is_array = isinstance(attr, (list, tuple))
-        value_is_array = isinstance(value, (list, tuple))
+        is_object_attr_array = isinstance(object_attr, (list, tuple))
+        is_policy_value_array = isinstance(policy_value, (list, tuple))
 
-        # positive and negative operator
-        # ==  命中一个即返回
-        # !=  需要全部遍历完, 确认全部不等于才返回?
-        if self.op.startswith("not_"):
-            return self._eval_negative(attr, attr_is_array, value, value_is_array)
-        else:
-            return self._eval_positive(attr, attr_is_array, value, value_is_array)
+        # any
+        if self.op == OP.ANY:
+            return True
+
+        # if you add new operator, please read this first: https://github.com/TencentBlueKing/bk-iam-saas/issues/1293
+        # valid the attr and value first
+        if self.op in (OP.IN, OP.NOT_IN):
+            # a in b, a not_in b
+            # b should be an array, while a can be a single or an array
+            # so we should make the in expression b always be an array
+            if not is_policy_value_array:
+                return False
+
+            if self.op == OP.IN:
+                return self._eval_positive(object_attr, is_object_attr_array, policy_value)
+            else:
+                return self._eval_negative(object_attr, is_object_attr_array, policy_value)
+
+        if self.op in (OP.CONTAINS, OP.NOT_CONTAINS):
+            # a contains b,  a not_contains b
+            # a should be an array, b should be a single value
+            # so, we should make the contains expression b always be a single string,
+            # while a can be a single value or an array
+            if not is_object_attr_array or is_policy_value_array:
+                return False
+            return self.calculate(object_attr, policy_value)
+
+        if self.op in (
+            OP.EQ,
+            OP.NOT_EQ,
+            OP.LT,
+            OP.LTE,
+            OP.GT,
+            OP.GTE,
+            OP.STARTS_WITH,
+            OP.NOT_STARTS_WITH,
+            OP.ENDS_WITH,
+            OP.NOT_ENDS_WITH,
+            OP.STRING_CONTAINS,
+        ):
+            # a starts_with b, a not_starts_with, a ends_with b, a not_ends_with b
+            # b should be a single value, while a can be a single value or an array
+            if is_policy_value_array:
+                return False
+
+            # positive and negative operator
+            # ==  命中一个即返回
+            # !=  需要全部遍历完, 确认全部不等于才返回?
+            if self.op.startswith("not_"):
+                return self._eval_negative(object_attr, is_object_attr_array, policy_value)
+            else:
+                return self._eval_positive(object_attr, is_object_attr_array, policy_value)
 
 
 class EqualOperator(BinaryOperator):
@@ -318,7 +280,6 @@ class NotContainsOperator(BinaryOperator):
 
 class StartsWithOperator(BinaryOperator):
     def __init__(self, field, value):
-        # TODO: value should be string?
         super(StartsWithOperator, self).__init__(OP.STARTS_WITH, field, value)
 
     def calculate(self, left, right):
@@ -327,7 +288,6 @@ class StartsWithOperator(BinaryOperator):
 
 class NotStartsWithOperator(BinaryOperator):
     def __init__(self, field, value):
-        # TODO: value should be string?
         super(NotStartsWithOperator, self).__init__(OP.NOT_STARTS_WITH, field, value)
 
     def calculate(self, left, right):
@@ -336,7 +296,6 @@ class NotStartsWithOperator(BinaryOperator):
 
 class EndsWithOperator(BinaryOperator):
     def __init__(self, field, value):
-        # TODO: value should be string?
         super(EndsWithOperator, self).__init__(OP.ENDS_WITH, field, value)
 
     def calculate(self, left, right):
@@ -345,11 +304,18 @@ class EndsWithOperator(BinaryOperator):
 
 class NotEndsWithOperator(BinaryOperator):
     def __init__(self, field, value):
-        # TODO: value should be string?
         super(NotEndsWithOperator, self).__init__(OP.NOT_ENDS_WITH, field, value)
 
     def calculate(self, left, right):
         return not left.endswith(right)
+
+
+class StringContainsOperator(BinaryOperator):
+    def __init__(self, field, value):
+        super(StringContainsOperator, self).__init__(OP.STRING_CONTAINS, field, value)
+
+    def calculate(self, left, right):
+        return right in left
 
 
 class LTOperator(BinaryOperator):
@@ -407,6 +373,7 @@ BINARY_OPERATORS = {
     OP.NOT_STARTS_WITH: NotStartsWithOperator,
     OP.ENDS_WITH: EndsWithOperator,
     OP.NOT_ENDS_WITH: NotEndsWithOperator,
+    OP.STRING_CONTAINS: StringContainsOperator,
     OP.LT: LTOperator,
     OP.LTE: LTEOperator,
     OP.GT: GTOperator,

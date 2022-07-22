@@ -11,6 +11,8 @@ specific language governing permissions and limitations under the License.
 """
 import unittest
 
+from iam.eval.operators import StringContainsOperator
+
 try:
     from unittest.mock import patch
 except ImportError:
@@ -173,6 +175,10 @@ def test_in_operator():
     assert inop.eval(d1)
     assert not inop.eval(d2)
 
+    # IN, policy_value is not an array, always False
+    assert not InOperator("host.id", "a1").eval(d1)
+    assert not InOperator("host.id", "a1").eval(d2)
+
     # NOT_IN
     notinop = NotInOperator("host.id", ["a1", "a3"])
 
@@ -181,6 +187,10 @@ def test_in_operator():
 
     assert not notinop.eval(d1)
     assert notinop.eval(d2)
+
+    # NOT_IN, policy_value is not an array, always False
+    assert not NotInOperator("host.id", "a1").eval(d1)
+    assert not NotInOperator("host.id", "a1").eval(d2)
 
     # attr is a list
     # common: a3
@@ -204,6 +214,8 @@ def test_in_operator():
     )
     assert not inop.eval(d4)
     assert notinop.eval(d4)
+
+    # policy value is not an array
 
 
 def test_contains_operator():
@@ -240,20 +252,20 @@ def test_contains_operator():
     assert not nc.eval(d1)
     assert nc.eval(d2)
 
-    # value is a list
+    # if policy_value is a list, always be false!
     c1 = ContainsOperator("host.owner", ["a1", "a2"])
     nc1 = NotContainsOperator("host.owner", ["a1", "a2"])
 
     d3 = ObjectSet()
     d3.add_object("host", {"owner": ["a3", "a2"]})
 
-    assert c1.eval(d3)
+    assert not c1.eval(d3)
     assert not nc1.eval(d3)
 
     d4 = ObjectSet()
     d4.add_object("host", {"owner": ["b1", "b2"]})
     assert not c1.eval(d4)
-    assert nc1.eval(d4)
+    assert not nc1.eval(d4)
 
 
 def test_text_operator():
@@ -280,6 +292,10 @@ def test_text_operator():
     assert sw.eval(d1)
     assert not sw.eval(d2)
 
+    # STARTS_WITH, policy_value is an array, always False
+    assert not StartsWithOperator("person.name", ["hel"]).eval(d1)
+    assert not StartsWithOperator("person.name", ["hel"]).eval(d2)
+
     # NOT_STARTS_WITH
     nsw = NotStartsWithOperator("person.name", "hel")
 
@@ -288,6 +304,10 @@ def test_text_operator():
 
     assert not nsw.eval(d1)
     assert nsw.eval(d2)
+
+    # NOT_STARTS_WITH, policy_value is an array, always False
+    assert not NotStartsWithOperator("person.name", ["hel"]).eval(d1)
+    assert not NotStartsWithOperator("person.name", ["hel"]).eval(d2)
 
     # ENDS_WITH
     ew = EndsWithOperator("person.name", "llo")
@@ -298,6 +318,10 @@ def test_text_operator():
     assert ew.eval(d1)
     assert not ew.eval(d2)
 
+    # ENDS_WITH, policy_value is an array, always False
+    assert not EndsWithOperator("person.name", ["llo"]).eval(d1)
+    assert not EndsWithOperator("person.name", ["llo"]).eval(d2)
+
     # NOT_ENDS_WITH
     new = NotEndsWithOperator("person.name", "llo")
 
@@ -306,6 +330,23 @@ def test_text_operator():
 
     assert not new.eval(d1)
     assert new.eval(d2)
+
+    # NOT_ENDS_WITH, policy_value is an array, always False
+    assert not NotEndsWithOperator("person.name", ["llo"]).eval(d1)
+    assert not NotEndsWithOperator("person.name", ["llo"]).eval(d2)
+
+    # STRING_CONTAINS
+    ew = StringContainsOperator("person.name", "llo")
+
+    assert ew.op == OP.STRING_CONTAINS
+    assert ew.expr() == "(person.name string_contains 'llo')"
+
+    assert ew.eval(d1)
+    assert not ew.eval(d2)
+
+    # STRING_CONTAINS, policy_value is an array, always False
+    assert not StringContainsOperator("person.name", ["llo"]).eval(d1)
+    assert not StringContainsOperator("person.name", ["llo"]).eval(d2)
 
 
 def test_math_operator():
@@ -371,6 +412,15 @@ def test_math_operator():
     assert gte.eval(d2)
     assert gte.eval(d3)
 
+    # GTE, policy list is an array, will all get False
+    gte = GTEOperator("person.age", [21, 20])
+
+    assert gte.op == OP.GTE
+    assert gte.expr() == "(person.age gte [21, 20])"
+    assert not gte.eval(d1)
+    assert not gte.eval(d2)
+    assert not gte.eval(d3)
+
 
 def test_any_operator():
     a = AnyOperator("host.id", "localhost")
@@ -420,17 +470,13 @@ def test_binary_operator_eval_positive():
     eq1 = EqualOperator("host.id", 1)
     assert eq1.eval(d1)
 
-    eq2 = EqualOperator("host.id", [1, 2])
-    assert eq2.eval(d1)
-
     eq3 = EqualOperator("host.id", 2)
     assert eq3.eval(d2)
 
-    eq4 = EqualOperator("host.id", [5, 1])
-    assert eq4.eval(d2)
-
-    eq5 = EqualOperator("host.id", [3, 4])
-    assert not eq5.eval(d2)
+    # if policyValue is an array, always got false
+    assert not EqualOperator("host.id", [1, 2]).eval(d1)
+    assert not EqualOperator("host.id", [5, 1]).eval(d2)
+    assert not EqualOperator("host.id", [3, 4]).eval(d2)
 
     # IN
     d3 = ObjectSet()
@@ -452,8 +498,8 @@ def test_binary_operator_eval_positive():
             "id": [1, 2],
         },
     )
-    # [1, 2] contains 1 of [2,4]
-    eq6 = ContainsOperator("host.id", [2, 4])
+    # [1, 2] contains 2
+    eq6 = ContainsOperator("host.id", 2)
     assert eq6.eval(d4)
 
 
@@ -476,17 +522,13 @@ def test_binary_operator_eval_negative():
     neq1 = NotEqualOperator("host.id", 2)
     assert neq1.eval(d1)
 
-    neq2 = NotEqualOperator("host.id", [2])
-    assert neq2.eval(d1)
-
-    neq3 = NotEqualOperator("host.id", [3, 4])
-    assert neq3.eval(d2)
-
     neq4 = NotEqualOperator("host.id", 3)
     assert neq4.eval(d2)
 
-    neq5 = NotEqualOperator("host.id", [2, 3])
-    assert not neq5.eval(d2)
+    # not_eq policy value is an array, always False
+    assert not NotEqualOperator("host.id", [2]).eval(d1)
+    assert not NotEqualOperator("host.id", [3, 4]).eval(d2)
+    assert not NotEqualOperator("host.id", [2, 3]).eval(d2)
 
     # NOT_IN
     d3 = ObjectSet()
@@ -508,8 +550,8 @@ def test_binary_operator_eval_negative():
             "id": [1, 2],
         },
     )
-    # [1,2] not contains all of [3,4]
-    eq6 = NotContainsOperator("host.id", [3, 4])
+    # [1,2] not contains 3
+    eq6 = NotContainsOperator("host.id", 3)
     assert eq6.eval(d4)
 
 

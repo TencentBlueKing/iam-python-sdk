@@ -1,5 +1,15 @@
 版本日志
 ===============
+
+# v1.2.1
+
+- add: operator `string_contains` #68
+- update: 规范化所有操作符左值/右值, 并增加校验(校验失败直接False)
+- refactor: expression eval
+
+注意: 如果使用 RBAC 接入权限中心, 必须使用这个版本的 SDK(action.auth_type="rbac")
+
+
 # v1.2.0
 
 - support django 3.2
