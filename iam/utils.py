@@ -83,6 +83,8 @@ def gen_perms_apply_data(system, subject, action_to_resources_list):
 
                     if topo_path:
                         for part in topo_path[1:-1].split("/"):
+                            # NOTE: old _bk_iam_path_ is like /set,1/host,2/
+                            # while the new _bk_iam_path_ is like /bk_cmdb,set,1/bk_cmdb,host,2/
                             node_parts = part.split(",")
                             rtype, rid = "", ""
                             if len(node_parts) == 2:
