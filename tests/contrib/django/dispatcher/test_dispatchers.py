@@ -23,7 +23,7 @@ except ImportError:
 
 from iam.contrib.django.dispatcher import DjangoBasicResourceApiDispatcher, InvalidPageException
 from iam.exceptions import AuthInvalidOperation
-from iam.resource.provider import ListResult, ResourceProvider
+from iam.resource.provider import ListResult, SchemaResult, ResourceProvider
 
 
 def test_basic_resource_api_dispatcher_register():
@@ -52,6 +52,12 @@ def test_basic_resource_api_dispatcher_register():
 
         def search_instance(self, filter, page, **options):
             return ListResult(results=[filter, page], count=100)
+
+        def fetch_instance_list(self, filter, page, **options):
+            return ListResult(results=[filter, page], count=100)
+
+        def fetch_resource_type_schema(self, **options):
+            return SchemaResult(properties={"id": {"type": "string"}})
 
     with pytest.raises(AuthInvalidOperation):
         dispatcher.register("type", "provider")
@@ -257,12 +263,16 @@ def test_basic_resource_api_dispatcher__dispatch():
             self.fetch_instance_info_spy = {}
             self.list_instance_by_policy_spy = {}
             self.search_instance_spy = {}
+            self.fetch_instance_list_spy = {}
+            self.fetch_resource_type_schema_spy = {}
             self.pre_list_attr = MagicMock()
             self.pre_list_attr_value = MagicMock()
             self.pre_list_instance = MagicMock()
             self.pre_fetch_instance_info = MagicMock()
             self.pre_list_instance_by_policy = MagicMock()
             self.pre_search_instance = MagicMock()
+            self.pre_fetch_instance_list = MagicMock()
+            self.pre_fetch_resource_type_schema = MagicMock()
 
         def list_attr(self, **options):
             self.list_attr_spy["options"] = options
@@ -296,6 +306,16 @@ def test_basic_resource_api_dispatcher__dispatch():
             self.search_instance_spy["page"] = page
             self.search_instance_spy["options"] = options
             return ListResult(results=["search_instance_token"], count=100)
+
+        def fetch_instance_list(self, filter, page, **options):
+            self.fetch_instance_list_spy["filter"] = filter
+            self.fetch_instance_list_spy["page"] = page
+            self.fetch_instance_list_spy["options"] = options
+            return ListResult(results=["fetch_instance_list_token"], count=100)
+
+        def fetch_resource_type_schema(self, **options):
+            self.fetch_resource_type_schema_spy["options"] = options
+            return SchemaResult(properties={"fetch_resource_type_schema_token"})
 
     provider = SpyResourceProvider()
     dispatcher.register("spy", provider)
@@ -450,3 +470,48 @@ def test_basic_resource_api_dispatcher__dispatch():
         "filter": {"expression": "expression"},
         "page": {"limit": "limit", "offset": "offset"},
     }
+
+    # test fetch_instance_list
+    fetch_instance_list_req = MagicMock()
+    fetch_instance_list_req.body = json.dumps(
+        {
+            "method": "fetch_instance_list",
+            "type": "spy",
+            "filter": {"start_time": 1654012800, "end_time": 1654099199},
+            "page": {"limit": "limit", "offset": "offset"},
+        }
+    )
+    fetch_instance_list_req.META = {"HTTP_X_REQUEST_ID": "rid", "HTTP_BLUEKING_LANGUAGE": "en"}
+
+    resp = dispatcher._dispatch(fetch_instance_list_req)
+
+    provider.pre_fetch_instance_list.assert_called_once_with(
+        {"start_time": 1654012800, "end_time": 1654099199},
+        {"limit": "limit", "offset": "offset"},
+        language="en",
+    )
+    assert resp["code"] == 0
+    assert resp["result"] is True
+    assert resp["data"] == {"count": 100, "results": ["fetch_instance_list_token"]}
+    assert resp["X-Request-Id"] == "rid"
+    assert "message" in resp
+    assert provider.fetch_instance_list_spy == {
+        "options": {"language": "en"},
+        "filter": {"start_time": 1654012800, "end_time": 1654099199},
+        "page": {"limit": "limit", "offset": "offset"},
+    }
+
+    # test fetch_resource_type_schema
+    fetch_resource_type_schema_req = MagicMock()
+    fetch_resource_type_schema_req.body = json.dumps({"method": "fetch_resource_type_schema", "type": "spy"})
+    fetch_resource_type_schema_req.META = {"HTTP_X_REQUEST_ID": "rid", "HTTP_BLUEKING_LANGUAGE": "en"}
+
+    resp = dispatcher._dispatch(fetch_resource_type_schema_req)
+
+    provider.pre_fetch_resource_type_schema.assert_called_once_with(language="en")
+    assert resp["code"] == 0
+    assert resp["result"] is True
+    assert resp["data"] == SchemaResult(properties={"fetch_resource_type_schema_token"}).to_dict()
+    assert resp["X-Request-Id"] == "rid"
+    assert "message" in resp
+    assert provider.fetch_resource_type_schema_spy == {"options": {"language": "en"}}

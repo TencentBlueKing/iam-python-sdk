@@ -14,6 +14,8 @@ import abc
 
 import six
 
+from iam.resource.constants import SchemaSpecificType
+
 
 class ListResult(object):
     def __init__(self, results, count):
@@ -29,6 +31,18 @@ class ListResult(object):
 
     def to_list(self):
         return self.results
+
+
+class SchemaResult(object):
+    def __init__(self, properties):
+        """
+        :param properties: 资源类型 schema 定义
+        """
+        self.type = SchemaSpecificType.OBJECT
+        self.properties = properties
+
+    def to_dict(self):
+        return {"type": self.type, "properties": self.properties}
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -78,5 +92,21 @@ class ResourceProvider(object):
         """
         处理来自 iam 的 search_instance 请求
         return: ListResult
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def fetch_instance_list(self, filter, page, **options):
+        """
+        处理来自 iam 的 fetch_instance_list 请求
+        return: ListResult
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def fetch_resource_type_schema(self, **options):
+        """
+        处理来自 iam 的 fetch_resource_type_schema 请求
+        return: SchemaResult
         """
         raise NotImplementedError()
