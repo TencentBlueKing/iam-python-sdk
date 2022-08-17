@@ -10,32 +10,16 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 
-from iam.collection import FancyDict
 
+class SchemaSpecificType(object):
+    """
+    NOTE: don't want to use Enum
+    """
 
-def get_filter_obj(filter_data, filter_keys):
-    filter_obj = FancyDict()
-    _filter_data = filter_data or {}
-    for key in filter_keys:
-        filter_obj[key] = _filter_data.get(key)
-    return filter_obj
-
-
-class Page(object):
-    def __init__(self, limit, offset):
-        self.limit = limit
-        self.offset = offset
-
-    @property
-    def slice_from(self):
-        return self.offset
-
-    @property
-    def slice_to(self):
-        if self.limit == 0:
-            return None
-        return self.offset + self.limit
-
-
-def get_page_obj(page_data):
-    return Page(limit=int(page_data.get("limit") or 0), offset=int(page_data.get("offset") or 0))
+    ARRAY = "array"
+    BOOLEAN = "boolean"
+    INTEGER = "integer"
+    NULL = "null"
+    NUMBER = "number"
+    OBJECT = "object"
+    STRING = "string"
