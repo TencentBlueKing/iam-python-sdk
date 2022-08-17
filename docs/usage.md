@@ -543,6 +543,37 @@ Resource API Framework 中有两个核心概念：
       - `page.limit(int)`：查询数量
       - `page.offset(int)`：查询偏移
   - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM search_instance 响应协议
+7. `fetch_instance_list(filter, page, **options)`：处理来自 IAM 的 fetch_instance_list 请求，在审计中心生成静态资源快照时，需要实现此方法
+  - 参数：
+    - `filter`：过滤器对象
+      - `filter.start_time(int)`：资源实例变更时间的开始时间（包含start_time）
+      - `filter.end_time(int)`：资源实例变更时间的结束时间（包含end_time）
+    - `page`：分页对象
+      - `page.limit(int)`：查询数量
+      - `page.offset(int)`：查询偏移
+  - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM fetch_instance_list 响应协议
+8. `fetch_resource_type_schema(**options)`：处理来自 IAM 的 fetch_resource_type_schema 请求，在审计中心显示静态资源时，需要实现此方法
+  - 返回值：返回 `iam.resource.provider.SchemaResult` 的实例，输出结果可以通过 [JSON Schema Validator](https://www.jsonschemavalidator.net/) 校验
+  - `注意`：为满足`审计中心`需求，字段描述新增`description_en`、`code` 两个 Key，`description_en`指字段英文描述，`code（可选）`指该字段为`代码`内容，在`审计中心`将按代码格式显示
+  - DEMO（Response.data）
+  ```
+  {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "ID",
+        "description_en": "ID",
+      },
+      "script": {
+        "type": "string",
+        "description": "脚本",
+        "description_en": "Script",
+        "code": "shell"
+      }
+    }
+  }
+  ```
 
 除此之外，如果 Provider 中定义了 `pre_{method}` 方法（`method` 可选值（`list_attr`, `list_attr_value`, `list_instance`, `fetch_instance_info`, `list_instance_by_policy`），Dispatcher 会在调用对应的 `{method}` 方法前调用其对应的 `pre` 方法进行预处理，下面的例子检测 `list_instance` 中传入的 page 对象，如果 limit 过大，则拒绝该请求：
 
@@ -557,7 +588,7 @@ class TaskResourceProvider(ResourceProvider):
 下面是一种资源类型的 Provider 定义示例：
 
 ```python
-from iam.resource.provider import ResourceProvider, ListResult
+from iam.resource.provider import ResourceProvider, ListResult, SchemaResult
 from task.models import Tasks
 
 
@@ -614,6 +645,18 @@ class TaskResourceProvider(ResourceProvider):
         注意, 有翻页; 需要返回count
         """
         return ListResult(results=[], count=0)
+    
+    def fetch_instance_list(self, filter, page, **options):
+        """根据过滤条件搜索实例
+        注意, 有翻页; 需要返回count
+        """
+        return ListResult(results=[], count=0)
+
+    def fetch_resource_type_schema(self, **options):
+        """获取资源类型 schema 定义
+        schema定义
+        """
+        return SchemaResult(properties={})
 ```
 
 ### 3.2 Dispatcher
@@ -648,7 +691,7 @@ class TaskResourceProvider(ResourceProvider):
 from blueapps.account.decorators import login_exempt
 from iam import IAM
 from iam.contrib.django.dispatcher import DjangoBasicResourceApiDispatcher
-from iam.resource.provider import ResourceProvider, ListResult
+from iam.resource.provider import ResourceProvider, ListResult, SchemaResult
 from iam.contrib.converter.queryset import PathEqDjangoQuerySetConverter
 from django.conf.urls import url, include
 
@@ -762,6 +805,42 @@ class FlowResourceProvider(ResourceProvider):
     def search_instance(self, filter, page, **options):
         # TODO
         return ListResult(results=[], count=0)
+
+    def fetch_instance_list(self, filter, page, **options):
+        """
+        flow
+        """
+        queryset = TaskTemplate.objects.filter(updated_at__gte=filter.start_time).filter(updated_at__lte=filter.end_time)
+        results = []
+        for flow in queryset[page.slice_from : page.slice_to]:
+            results.append(
+                {
+                    "id": str(flow.id),
+                    "display_name": flow.name,
+                    "creator": flow.creator,
+                    "created_at": flow.created_at,
+                    "updater": flow.updater,
+                    "updated_at": flow.updated_at,
+                    "data": flow.to_json()
+                }
+            )
+        return ListResult(results=results, count=queryset.count())    
+    
+    def fetch_resource_type_schema(self, **options):
+        properties = {
+            "id": {
+                "type": "string",
+                "description": "ID",
+                "description_en": "ID",
+            },
+            "script": {
+                "type": "string",
+                "description": "脚本",
+                "description_en": "Script",
+                "code": "shell"
+            }
+        }
+        return SchemaResult(properties=properties)    
 
 dispatcher = DjangoBasicResourceApiDispatcher(iam, "my_system")
 dispatcher.register("flow", FlowResourceProvider())
