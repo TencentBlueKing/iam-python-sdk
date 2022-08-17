@@ -38,4 +38,4 @@ class Page(object):
 
 
 def get_page_obj(page_data):
-    return Page(limit=page_data.get("limit", 0), offset=page_data.get("offset", 0))
+    return Page(limit=int(page_data.get("limit") or 0), offset=int(page_data.get("offset") or 0))
