@@ -543,7 +543,7 @@ Resource API Framework 中有两个核心概念：
       - `page.limit(int)`：查询数量
       - `page.offset(int)`：查询偏移
   - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM search_instance 响应协议
-7. `fetch_instance_list(filter, page, **options)`：处理来自 IAM 的 fetch_instance_list 请求
+7. `fetch_instance_list(filter, page, **options)`：处理来自 IAM 的 fetch_instance_list 请求，在审计中心生成静态资源快照时，需要实现此方法
   - 参数：
     - `filter`：过滤器对象
       - `filter.start_time(int)`：资源实例变更时间的开始时间（包含start_time）
@@ -552,7 +552,7 @@ Resource API Framework 中有两个核心概念：
       - `page.limit(int)`：查询数量
       - `page.offset(int)`：查询偏移
   - 返回值：返回 `iam.resource.provider.ListResult` 的实例，其中 `results` 应满足 IAM fetch_instance_list 响应协议
-8. `fetch_resource_type_schema(**options)`：处理来自 IAM 的 fetch_resource_type_schema 请求
+8. `fetch_resource_type_schema(**options)`：处理来自 IAM 的 fetch_resource_type_schema 请求，在审计中心显示静态资源时，需要实现此方法
   - 返回值：返回 `iam.resource.provider.SchemaResult` 的实例，输出结果可以通过 [JSON Schema Validator](https://www.jsonschemavalidator.net/) 校验
   - `注意`：为满足`审计中心`需求，字段描述新增`description_en`、`code` 两个 Key，`description_en`指字段英文描述，`code（可选）`指该字段为`代码`内容，在`审计中心`将按代码格式显示
   - DEMO（Response.data）

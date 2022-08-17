@@ -95,18 +95,18 @@ class ResourceProvider(object):
         """
         raise NotImplementedError()
 
-    @abc.abstractmethod
     def fetch_instance_list(self, filter, page, **options):
         """
         处理来自 iam 的 fetch_instance_list 请求
+        在审计中心生成静态资源快照时，需要实现此方法
         return: ListResult
         """
-        raise NotImplementedError()
+        return ListResult(results=[], count=0)
 
-    @abc.abstractmethod
     def fetch_resource_type_schema(self, **options):
         """
         处理来自 iam 的 fetch_resource_type_schema 请求
+        在审计中心显示静态资源时，需要实现此方法
         return: SchemaResult
         """
-        raise NotImplementedError()
+        return SchemaResult(properties={})
