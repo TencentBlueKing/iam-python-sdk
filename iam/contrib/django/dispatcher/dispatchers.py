@@ -218,3 +218,32 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
         result = provider.search_instance(filter_obj, page_obj, **options)
 
         return success_response(result.to_dict(), request_id)
+
+    def _dispatch_fetch_instance_list(self, request, data, request_id):
+        options = self._get_options(request)
+
+        filter_obj = get_filter_obj(data.get("filter"), ["start_time", "end_time"])
+        page_obj = get_page_obj(data.get("page"))
+
+        provider = self._provider[data["type"]]
+
+        pre_process = getattr(provider, "pre_fetch_instance_list", None)
+        if pre_process and callable(pre_process):
+            pre_process(filter_obj, page_obj, **options)
+
+        result = provider.fetch_instance_list(filter_obj, page_obj, **options)
+
+        return success_response(result.to_dict(), request_id)
+
+    def _dispatch_fetch_resource_type_schema(self, request, data, request_id):
+        options = self._get_options(request)
+
+        provider = self._provider[data["type"]]
+
+        pre_process = getattr(provider, "pre_fetch_resource_type_schema", None)
+        if pre_process and callable(pre_process):
+            pre_process(**options)
+
+        result = provider.fetch_resource_type_schema(**options)
+
+        return success_response(result.to_dict(), request_id)

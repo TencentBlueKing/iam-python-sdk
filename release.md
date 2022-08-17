@@ -1,6 +1,10 @@
 版本日志
 ===============
 
+# v1.2.2
+
+- add: fetch_instance_list/fetch_resource_type_schema in ResourceProvider
+
 # v1.2.1
 
 - add: operator `string_contains` #68
