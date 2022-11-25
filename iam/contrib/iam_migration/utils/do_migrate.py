@@ -207,6 +207,9 @@ class Client(object):
         "add_feature_shield_rules": "add_feature_shield_rules",
         "update_feature_shield_rules": "update_feature_shield_rules",
         "upsert_feature_shield_rules": "update_feature_shield_rules",
+        "add_custom_frontend_settings": "add_custom_frontend_settings",
+        "update_custom_frontend_settings": "update_custom_frontend_settings",
+        "upsert_custom_frontend_settings": "update_custom_frontend_settings"
     }
 
     """
@@ -339,6 +342,17 @@ class Client(object):
         ok, message, data = self._call_iam_api(http_put, path, data)
         return ok, message
 
+    # ---------- custom_frontend_settings
+    def api_add_custom_frontend_settings(self, system_id, data):
+        path = "/api/v1/model/systems/{system_id}/configs/custom_frontend_settings".format(system_id=system_id)
+        ok, message, data = self._call_iam_api(http_post, path, data)
+        return ok, message
+
+    def api_update_custom_frontend_settings(self, system_id, data):
+        path = "/api/v1/model/systems/{system_id}/configs/custom_frontend_settings".format(system_id=system_id)
+        ok, message, data = self._call_iam_api(http_put, path, data)
+        return ok, message
+
     # ---------- query
 
     def api_query(self, system_id):
@@ -465,6 +479,12 @@ class Client(object):
 
     def update_feature_shield_rules(self, system_id, data):
         return self.api_update_feature_shield_rules(system_id, data)
+
+    def add_custom_frontend_settings(self, system_id, data):
+        return self.api_add_custom_frontend_settings(system_id, data)
+
+    def update_custom_frontend_settings(self, system_id, data):
+        return self.api_update_custom_frontend_settings(system_id, data)
 
     def upsert_system(self, system_id, data):
         if system_id not in self.system_id_set:
