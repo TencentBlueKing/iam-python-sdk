@@ -59,11 +59,13 @@ class Client(object):
             self._bk_paas_host = bk_paas_host
 
         # will add ?debug=true in url, for debug api/policy, show the details
-        is_api_debug_enabled = (os.environ.get("IAM_API_DEBUG") == "true"
-                                or os.environ.get("BKAPP_IAM_API_DEBUG") == "true")
+        is_api_debug_enabled = (
+            os.environ.get("IAM_API_DEBUG") == "true" or os.environ.get("BKAPP_IAM_API_DEBUG") == "true"
+        )
         # will add ?force=true in url, for api/policy run without cache(all data from database)
-        is_api_force_enabled = (os.environ.get("IAM_API_FORCE") == "true"
-                                or os.environ.get("BKAPP_IAM_API_FORCE") == "true")
+        is_api_force_enabled = (
+            os.environ.get("IAM_API_FORCE") == "true" or os.environ.get("BKAPP_IAM_API_FORCE") == "true"
+        )
 
         self._extra_url_params = {}
         if is_api_debug_enabled:
@@ -322,8 +324,19 @@ class Client(object):
         ok, message, data = self._call_iam_api(http_post, path, data)
         return ok, message, data
 
+    # --------- policy v2
+    def v2_policy_query(self, system_id, data):
+        path = f"/api/v2/policy/systems/{system_id}/query/"
+        ok, message, data = self._call_iam_api(http_post, path, data)
+        return ok, message, data
+
     def policy_query_by_actions(self, data):
         path = "/api/v1/policy/query_by_actions"
+        ok, message, data = self._call_iam_api(http_post, path, data)
+        return ok, message, data
+
+    def v2_policy_query_by_actions(self, system_id, data):
+        path = f"/api/v2/policy/systems/{system_id}/query_by_actions/"
         ok, message, data = self._call_iam_api(http_post, path, data)
         return ok, message, data
 

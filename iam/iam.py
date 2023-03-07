@@ -57,7 +57,7 @@ class IAM(object):
         if not with_resources:
             data["resources"] = []
 
-        ok, message, policies = self._client.policy_query(data)
+        ok, message, policies = self._client.v2_policy_query(request.system, data)
         if not ok:
             raise AuthAPIError(message)
         return policies
@@ -75,7 +75,7 @@ class IAM(object):
         if not with_resources:
             data["resources"] = []
 
-        ok, message, action_policies = self._client.policy_query_by_actions(data)
+        ok, message, action_policies = self._client.v2_policy_query_by_actions(request.system, data)
         if not ok:
             raise AuthAPIError(message)
         return action_policies
@@ -401,7 +401,7 @@ class IAM(object):
 
     # TODO: add the register model apis
     def get_token(self, system):
-        """ 获取token
+        """获取token
         return bool, message, token
         """
         return self._client.get_token(system)
