@@ -874,3 +874,11 @@ IAM(app_code, app_secret, bk_apigateway_url="http://bk-iam.{APIGATEWAY_DOMAIN}/p
 
 - `BK_IAM_USE_APIGATEWAY = True`
 - `BK_IAM_APIGATEWAY_URL = "http://bk-iam.{APIGATEWAY_DOMAIN}/{env}"`
+
+## 5. 使用 v1 鉴权 api
+
+当前SDK默认使用 v2 鉴权 api, 如果开发者环境的权限中心后台版本小于 v1.2.6, 则不支持直接使用v2 api, 需要配置`api_version`指定使用v1 api
+
+```python
+IAM(APP_CODE, APP_SECRET, BK_IAM_HOST, BK_PAAS_HOST, api_version="v1")
+```
