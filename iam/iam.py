@@ -37,7 +37,9 @@ class IAM(object):
     input: object
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None):
+    def __init__(
+        self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None, api_version="v2"
+    ):
         """
         如果有 APIGateway 且权限中心网关接入, 则可以统一API请求全部走APIGateway
         - 没有APIGateway的用法: IAM(app_code, app_secret, bk_iam_host, bk_paas_host)
@@ -46,7 +48,9 @@ class IAM(object):
         NOTE: 未来将会下线`没有 APIGateway的用法`
         TODO: 切换后, 所有暴露接口将不再依赖 bk_token/bk_username, 需考虑兼容调用方, 并文档说明
         """
-        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_apigateway_url)
+        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_apigateway_url, api_version)
+
+        self._api_version = api_version
 
     def _do_policy_query(self, request, with_resources=True):
         data = request.to_dict()
@@ -58,6 +62,10 @@ class IAM(object):
             data["resources"] = []
 
         ok, message, policies = self._client.v2_policy_query(request.system, data)
+        if self._api_version == "v2":
+            ok, message, policies = self._client.v2_policy_query(request.system, data)
+        else:
+            ok, message, policies = self._client.policy_query(data)
         if not ok:
             raise AuthAPIError(message)
         return policies
@@ -75,7 +83,10 @@ class IAM(object):
         if not with_resources:
             data["resources"] = []
 
-        ok, message, action_policies = self._client.v2_policy_query_by_actions(request.system, data)
+        if self._api_version == "v2":
+            ok, message, action_policies = self._client.v2_policy_query_by_actions(request.system, data)
+        else:
+            ok, message, action_policies = self._client.policy_query_by_actions(data)
         if not ok:
             raise AuthAPIError(message)
         return action_policies
