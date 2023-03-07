@@ -61,7 +61,6 @@ class IAM(object):
         if not with_resources:
             data["resources"] = []
 
-        ok, message, policies = self._client.v2_policy_query(request.system, data)
         if self._api_version == "v2":
             ok, message, policies = self._client.v2_policy_query(request.system, data)
         else:
