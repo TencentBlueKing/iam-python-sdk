@@ -41,6 +41,27 @@ def _test_ok_message_data(mock_request, call_func):
     assert data[1] == 1
 
 
+def _test_v2_ok_message_data(mock_request, call_func):
+    # 1. request fail
+    mock_request.return_value = (False, "error", {})
+    ok, message, data = call_func("system", {})
+
+    assert not ok
+
+    # 2. request success, code not 0
+    mock_request.return_value = (True, "error status_code != 200", {"code": 404, "message": "not found"})
+    ok, message, data = call_func("system", {})
+    assert not ok
+
+    # 3. request success, code 0
+    mock_request.return_value = (True, "ok", {"code": 0, "message": "ok", "data": {1: 1}})
+    ok, message, data = call_func("system", {})
+    assert ok
+    assert message == "ok"
+    assert data
+    assert data[1] == 1
+
+
 @patch("iam.api.client.http_post")
 def test_client_policy_query(mock_post):
     c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
@@ -48,6 +69,15 @@ def test_client_policy_query(mock_post):
     _test_ok_message_data(mock_post, c.policy_query)
 
     _test_ok_message_data(mock_post, c.policy_query_by_actions)
+
+
+@patch("iam.api.client.http_post")
+def test_v2_client_policy_query(mock_post):
+    c = Client("bk_paas", "", "http://127.0.0.1:1234", "http://127.0.0.1:8000")
+
+    _test_v2_ok_message_data(mock_post, c.v2_policy_query)
+
+    _test_v2_ok_message_data(mock_post, c.v2_policy_query_by_actions)
 
 
 def _test_ok_message(mock_request, call_func, kwargs):

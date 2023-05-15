@@ -37,7 +37,9 @@ class IAM(object):
     input: object
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None):
+    def __init__(
+        self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None, api_version="v2"
+    ):
         """
         如果有 APIGateway 且权限中心网关接入, 则可以统一API请求全部走APIGateway
         - 没有APIGateway的用法: IAM(app_code, app_secret, bk_iam_host, bk_paas_host)
@@ -48,6 +50,8 @@ class IAM(object):
         """
         self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_apigateway_url)
 
+        self._api_version = api_version
+
     def _do_policy_query(self, request, with_resources=True):
         data = request.to_dict()
         logger.debug("the request: %s", data)
@@ -57,7 +61,10 @@ class IAM(object):
         if not with_resources:
             data["resources"] = []
 
-        ok, message, policies = self._client.policy_query(data)
+        if self._api_version == "v2":
+            ok, message, policies = self._client.v2_policy_query(request.system, data)
+        else:
+            ok, message, policies = self._client.policy_query(data)
         if not ok:
             raise AuthAPIError(message)
         return policies
@@ -75,7 +82,10 @@ class IAM(object):
         if not with_resources:
             data["resources"] = []
 
-        ok, message, action_policies = self._client.policy_query_by_actions(data)
+        if self._api_version == "v2":
+            ok, message, action_policies = self._client.v2_policy_query_by_actions(request.system, data)
+        else:
+            ok, message, action_policies = self._client.policy_query_by_actions(data)
         if not ok:
             raise AuthAPIError(message)
         return action_policies
@@ -401,7 +411,7 @@ class IAM(object):
 
     # TODO: add the register model apis
     def get_token(self, system):
-        """ 获取token
+        """获取token
         return bool, message, token
         """
         return self._client.get_token(system)
