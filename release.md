@@ -1,6 +1,10 @@
 版本日志
 ===============
 
+# v1.3.1
+
+- add: 支持权限中心后台v2鉴权api
+
 # v1.2.2
 
 - add: fetch_instance_list/fetch_resource_type_schema in ResourceProvider
