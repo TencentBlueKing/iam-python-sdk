@@ -1,6 +1,10 @@
 版本日志
 ===============
 
+# v1.3.2
+
+- add: fetch_instance_list 支持 expression 表达式
+
 # v1.3.1
 
 - add: 支持权限中心后台v2鉴权api

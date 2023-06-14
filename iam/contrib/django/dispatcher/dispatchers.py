@@ -222,7 +222,7 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
     def _dispatch_fetch_instance_list(self, request, data, request_id):
         options = self._get_options(request)
 
-        filter_obj = get_filter_obj(data.get("filter"), ["start_time", "end_time"])
+        filter_obj = get_filter_obj(data.get("filter"), ["start_time", "end_time", "expression"])
         page_obj = get_page_obj(data.get("page"))
 
         provider = self._provider[data["type"]]

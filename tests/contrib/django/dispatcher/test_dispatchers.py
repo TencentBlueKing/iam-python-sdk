@@ -477,7 +477,7 @@ def test_basic_resource_api_dispatcher__dispatch():
         {
             "method": "fetch_instance_list",
             "type": "spy",
-            "filter": {"start_time": 1654012800, "end_time": 1654099199},
+            "filter": {"start_time": 1654012800, "end_time": 1654099199, "expression": None},
             "page": {"limit": "limit", "offset": "offset"},
         }
     )
@@ -486,7 +486,7 @@ def test_basic_resource_api_dispatcher__dispatch():
     resp = dispatcher._dispatch(fetch_instance_list_req)
 
     provider.pre_fetch_instance_list.assert_called_once_with(
-        {"start_time": 1654012800, "end_time": 1654099199},
+        {"start_time": 1654012800, "end_time": 1654099199, "expression": None},
         {"limit": "limit", "offset": "offset"},
         language="en",
     )
@@ -497,7 +497,7 @@ def test_basic_resource_api_dispatcher__dispatch():
     assert "message" in resp
     assert provider.fetch_instance_list_spy == {
         "options": {"language": "en"},
-        "filter": {"start_time": 1654012800, "end_time": 1654099199},
+        "filter": {"start_time": 1654012800, "end_time": 1654099199, "expression": None},
         "page": {"limit": "limit", "offset": "offset"},
     }
 
