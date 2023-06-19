@@ -45,7 +45,7 @@ class IAMMigrator(object):
             do_migrate.enable_use_apigateway()
             iam_host = getattr(settings, "BK_IAM_APIGATEWAY_URL", "")
             if iam_host == "":
-                raise exceptions.MigrationFailError("settings.BK_IAM_APIGATEWAY_URL should be setted")
+                raise exceptions.MigrationFailError("settings.BK_IAM_APIGATEWAY_URL should be set")
         else:
             iam_host = settings.BK_IAM_INNER_HOST
 
