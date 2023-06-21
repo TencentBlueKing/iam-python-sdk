@@ -34,11 +34,10 @@ renders = {"upsert_system": upsert_system_render}
 class IAMMigrator(object):
     def __init__(self, migration_json):
         self.migration_json = migration_json
+        self._bk_app_code = getattr(settings, "APP_CODE", "")
+        self._bk_app_secret = settings.SECRET_KEY
 
     def migrate(self):
-        app_code = settings.APP_CODE
-        app_secret = settings.SECRET_KEY
-
         iam_host = ""
         USE_APIGATEWAY = getattr(settings, "BK_IAM_USE_APIGATEWAY", False)
         if USE_APIGATEWAY:
@@ -71,6 +70,6 @@ class IAMMigrator(object):
         if not ok:
             raise exceptions.NetworkUnreachableError("bk iam ping error")
 
-        ok = do_migrate.do_migrate(data, iam_host, app_code, app_secret)
+        ok = do_migrate.do_migrate(data, iam_host, self._bk_app_code, self._bk_app_secret)
         if not ok:
             raise exceptions.MigrationFailError("iam migrate fail")
