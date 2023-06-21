@@ -1,6 +1,10 @@
 版本日志
 ===============
 
+# v1.3.3
+
+- add: list_instance、search_instance 新增 action 返回
+
 # v1.3.2
 
 - add: fetch_instance_list 支持 expression 表达式
