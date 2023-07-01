@@ -1,6 +1,11 @@
 版本日志
 ===============
 
+# v1.3.4
+
+- IAMMigrator 将 bk_app_code/bk_app_secret 设置为类实例属性
+- cachetools 依赖版本号调整为：cachetools>=3.1.1,<6.0
+
 # v1.3.3
 
 - add: list_instance、search_instance 新增 action 返回
