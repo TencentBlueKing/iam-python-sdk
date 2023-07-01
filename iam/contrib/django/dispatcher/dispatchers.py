@@ -84,7 +84,7 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
             data = json.loads(request.body)
         except Exception:
             logger.error("resource request(%s) failed with invalid body: %s", request_id, request.body)
-            return fail_response(400, "reqeust body is not a valid json", request_id)
+            return fail_response(400, "request body is not a valid json", request_id)
 
         # check basic params
         method = data.get("method")
