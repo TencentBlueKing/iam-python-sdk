@@ -84,7 +84,7 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
             data = json.loads(request.body)
         except Exception:
             logger.error("resource request(%s) failed with invalid body: %s", request_id, request.body)
-            return fail_response(400, "reqeust body is not a valid json", request_id)
+            return fail_response(400, "request body is not a valid json", request_id)
 
         # check basic params
         method = data.get("method")
@@ -151,7 +151,7 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
     def _dispatch_list_instance(self, request, data, request_id):
         options = self._get_options(request)
 
-        filter_obj = get_filter_obj(data.get("filter"), ["parent", "search", "resource_type_chain"])
+        filter_obj = get_filter_obj(data.get("filter"), ["parent", "search", "action", "resource_type_chain"])
         page_obj = get_page_obj(data.get("page"))
 
         provider = self._provider[data["type"]]
@@ -198,7 +198,7 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
     def _dispatch_search_instance(self, request, data, request_id):
         options = self._get_options(request)
 
-        filter_obj = get_filter_obj(data.get("filter"), ["parent", "keyword"])
+        filter_obj = get_filter_obj(data.get("filter"), ["parent", "action", "keyword"])
 
         if filter_obj.keyword is None or len(filter_obj.keyword) < 2:
             raise KeywordTooShortException("the length of keyword should be greater than or equals to 2")
@@ -222,7 +222,7 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
     def _dispatch_fetch_instance_list(self, request, data, request_id):
         options = self._get_options(request)
 
-        filter_obj = get_filter_obj(data.get("filter"), ["start_time", "end_time"])
+        filter_obj = get_filter_obj(data.get("filter"), ["start_time", "end_time", "expression"])
         page_obj = get_page_obj(data.get("page"))
 
         provider = self._provider[data["type"]]
