@@ -119,7 +119,7 @@ def test_basic_resource_api_dispatcher__dispatch__json_load_fail():
     assert resp["code"] == 400
     assert resp["result"] is False
     assert resp["data"] is None
-    assert resp["message"] == "reqeust body is not a valid json"
+    assert resp["message"] == "request body is not a valid json"
     assert "X-Request-Id" in resp
 
 
@@ -369,7 +369,13 @@ def test_basic_resource_api_dispatcher__dispatch():
         {
             "method": "list_instance",
             "type": "spy",
-            "filter": {"parent": "parent", "search": "search", "resource_type_chain": "resource_type_chain"},
+            "filter": {
+                "parent": "parent",
+                "search": "search",
+                "ancestors": "ancestors",
+                "action": "action",
+                "resource_type_chain": "resource_type_chain"
+            },
             "page": {"limit": "limit", "offset": "offset"},
         }
     )
@@ -378,7 +384,13 @@ def test_basic_resource_api_dispatcher__dispatch():
     resp = dispatcher._dispatch(list_instance_req)
 
     provider.pre_list_instance.assert_called_once_with(
-        {"parent": "parent", "search": "search", "resource_type_chain": "resource_type_chain"},
+        {
+            "parent": "parent",
+            "search": "search",
+            "ancestors": "ancestors",
+            "resource_type_chain": "resource_type_chain",
+            "action": "action",
+        },
         {"limit": "limit", "offset": "offset"},
         language="en",
     )
@@ -389,7 +401,13 @@ def test_basic_resource_api_dispatcher__dispatch():
     assert "message" in resp
     assert provider.list_instance_spy == {
         "options": {"language": "en"},
-        "filter": {"parent": "parent", "search": "search", "resource_type_chain": "resource_type_chain"},
+        "filter": {
+            "parent": "parent",
+            "search": "search",
+            "ancestors": "ancestors",
+            "resource_type_chain": "resource_type_chain",
+            "action": "action"
+        },
         "page": {"limit": "limit", "offset": "offset"},
     }
 
@@ -399,7 +417,7 @@ def test_basic_resource_api_dispatcher__dispatch():
         {
             "method": "search_instance",
             "type": "spy",
-            "filter": {"parent": "parent", "keyword": "keyword"},
+            "filter": {"parent": "parent", "keyword": "keyword", "action": "action", "ancestors": "ancestors"},
             "page": {"limit": "limit", "offset": "offset"},
         }
     )
@@ -408,7 +426,7 @@ def test_basic_resource_api_dispatcher__dispatch():
     resp = dispatcher._dispatch(search_instance_req)
 
     provider.pre_search_instance.assert_called_once_with(
-        {"parent": "parent", "keyword": "keyword"},
+        {"parent": "parent", "keyword": "keyword", "action": "action", "ancestors": "ancestors"},
         {"limit": "limit", "offset": "offset"},
         language="en",
     )
@@ -419,7 +437,7 @@ def test_basic_resource_api_dispatcher__dispatch():
     assert "message" in resp
     assert provider.search_instance_spy == {
         "options": {"language": "en"},
-        "filter": {"parent": "parent", "keyword": "keyword"},
+        "filter": {"parent": "parent", "keyword": "keyword", "action": "action", "ancestors": "ancestors"},
         "page": {"limit": "limit", "offset": "offset"},
     }
 
