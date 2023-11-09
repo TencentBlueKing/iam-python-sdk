@@ -65,6 +65,7 @@ def test_gen_perms_apply_data():
                 "module": "module_type",
             },
             "another_system": {"r4": "r4_type"},
+            "bk_cmdb": {"biz": "biz", "set": "set", "module": "module"}
         }[system][resource]
 
     with patch("iam.utils.meta.get_system_name", MagicMock(side_effect=get_system_name)):
@@ -90,7 +91,6 @@ def test_gen_perms_apply_data():
                 )
 
                 # assert data
-    # TODO: fix dict compare
     assert data == {
         "system_id": "test_system",
         "system_name": "test_system_name",
@@ -105,21 +105,55 @@ def test_gen_perms_apply_data():
                         "type": "r3",
                         "type_name": "r3_type",
                         "instances": [
-                            [{"type": "r1", "type_name": "r1_type", "id": "r1id", "name": "r1n"}],
-                            [{"type": "r2", "type_name": "r2_type", "id": "r2id", "name": ""}],
-                            [{"type": "r3", "type_name": "r3_type", "id": "r3id", "name": ""}],
-                        ],
+                            [
+                                {
+                                    "type": "r1",
+                                    "type_name": "r1_type",
+                                    "id": "r1id",
+                                    "name": "r1n"
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r2",
+                                    "type_name": "r2_type",
+                                    "id": "r2id",
+                                    "name": ""
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r3",
+                                    "type_name": "r3_type",
+                                    "id": "r3id",
+                                    "name": ""
+                                }
+                            ]
+                        ]
                     },
                     {
                         "system_id": "another_system",
                         "system_name": "another_system_name",
                         "type": "r4",
                         "type_name": "r4_type",
-                        "instances": [[{"type": "r4", "type_name": "r4_type", "id": "r4id", "name": "r4n"}]],
-                    },
-                ],
+                        "instances": [
+                            [
+                                {
+                                    "type": "r4",
+                                    "type_name": "r4_type",
+                                    "id": "r4id",
+                                    "name": "r4n"
+                                }
+                            ]
+                        ]
+                    }
+                ]
             },
-            {"id": "action2", "name": "action2_name", "related_resource_types": []},
+            {
+                "id": "action2",
+                "name": "action2_name",
+                "related_resource_types": []
+            },
             {
                 "id": "action3",
                 "name": "action3_name",
@@ -130,13 +164,55 @@ def test_gen_perms_apply_data():
                         "type": "r3",
                         "type_name": "r3_type",
                         "instances": [
-                            [{"type": "r1", "type_name": "r1_type", "id": "r1id", "name": "r1n"}],
-                            [{"type": "r3", "type_name": "r3_type", "id": "r3id", "name": ""}],
-                            [{"type": "r1", "type_name": "r1_type", "id": "r1id", "name": "r1n"}],
-                            [{"type": "r3", "type_name": "r3_type", "id": "r3id", "name": ""}],
-                            [{"type": "r2", "type_name": "r2_type", "id": "r2id", "name": ""}],
-                            [{"type": "r3", "type_name": "r3_type", "id": "r3id", "name": ""}],
-                        ],
+                            [
+                                {
+                                    "type": "r1",
+                                    "type_name": "r1_type",
+                                    "id": "r1id",
+                                    "name": "r1n"
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r3",
+                                    "type_name": "r3_type",
+                                    "id": "r3id",
+                                    "name": ""
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r1",
+                                    "type_name": "r1_type",
+                                    "id": "r1id",
+                                    "name": "r1n"
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r3",
+                                    "type_name": "r3_type",
+                                    "id": "r3id",
+                                    "name": ""
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r2",
+                                    "type_name": "r2_type",
+                                    "id": "r2id",
+                                    "name": ""
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r3",
+                                    "type_name": "r3_type",
+                                    "id": "r3id",
+                                    "name": ""
+                                }
+                            ]
+                        ]
                     },
                     {
                         "system_id": "another_system",
@@ -144,12 +220,33 @@ def test_gen_perms_apply_data():
                         "type": "r4",
                         "type_name": "r4_type",
                         "instances": [
-                            [{"type": "r4", "type_name": "r4_type", "id": "r4id", "name": "r4n"}],
-                            [{"type": "r4", "type_name": "r4_type", "id": "r4id", "name": "r4n"}],
-                            [{"type": "r4", "type_name": "r4_type", "id": "r5id", "name": "r5n"}],
-                        ],
-                    },
-                ],
+                            [
+                                {
+                                    "type": "r4",
+                                    "type_name": "r4_type",
+                                    "id": "r4id",
+                                    "name": "r4n"
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r4",
+                                    "type_name": "r4_type",
+                                    "id": "r4id",
+                                    "name": "r4n"
+                                }
+                            ],
+                            [
+                                {
+                                    "type": "r4",
+                                    "type_name": "r4_type",
+                                    "id": "r5id",
+                                    "name": "r5n"
+                                }
+                            ]
+                        ]
+                    }
+                ]
             },
             {
                 "id": "action4",
@@ -162,14 +259,34 @@ def test_gen_perms_apply_data():
                         "type_name": "r6_type",
                         "instances": [
                             [
-                                {"type": "biz", "type_name": "biz_type", "id": "1", "name": "biz,1"},
-                                {"type": "set", "type_name": "set_type", "id": "2", "name": "set,2"},
-                                {"type": "module", "type_name": "module_type", "id": "3", "name": "module,3"},
-                                {"type": "r6", "type_name": "r6_type", "id": "r6id", "name": "r6n"},
+                                {
+                                    "type": "biz",
+                                    "type_name": "biz_type",
+                                    "id": "1",
+                                    "name": "biz,1"
+                                },
+                                {
+                                    "type": "set",
+                                    "type_name": "set_type",
+                                    "id": "2",
+                                    "name": "set,2"
+                                },
+                                {
+                                    "type": "module",
+                                    "type_name": "module_type",
+                                    "id": "3",
+                                    "name": "module,3"
+                                },
+                                {
+                                    "type": "r6",
+                                    "type_name": "r6_type",
+                                    "id": "r6id",
+                                    "name": "r6n"
+                                }
                             ]
-                        ],
+                        ]
                     }
-                ],
+                ]
             },
             {
                 "id": "action4",
@@ -182,14 +299,34 @@ def test_gen_perms_apply_data():
                         "type_name": "r7_type",
                         "instances": [
                             [
-                                {"type": "biz", "type_name": "biz_type", "id": "1", "name": "biz,1"},
-                                {"type": "set", "type_name": "set_type", "id": "2", "name": "set,2"},
-                                {"type": "module", "type_name": "module_type", "id": "3", "name": "module,3"},
-                                {"type": "r7", "type_name": "r7_type", "id": "r7id", "name": "r7n"},
+                                {
+                                    "type": "biz",
+                                    "type_name": "biz",
+                                    "id": "1",
+                                    "name": "biz,1"
+                                },
+                                {
+                                    "type": "set",
+                                    "type_name": "set",
+                                    "id": "2",
+                                    "name": "set,2"
+                                },
+                                {
+                                    "type": "module",
+                                    "type_name": "module",
+                                    "id": "3",
+                                    "name": "module,3"
+                                },
+                                {
+                                    "type": "r7",
+                                    "type_name": "r7_type",
+                                    "id": "r7id",
+                                    "name": "r7n"
+                                }
                             ]
-                        ],
+                        ]
                     }
-                ],
-            },
-        ],
+                ]
+            }
+        ]
     }
