@@ -3,6 +3,11 @@
 
 # v1.3.5
 
+- fix: gen_perms_apply_data拓扑资源按照资源类型聚合
+
+
+# v1.3.5
+
 - add: list_instance、search_instance 新增 ancestors 返回
 - fix: gen_perms_apply_data拓扑资源需考虑system id
 
