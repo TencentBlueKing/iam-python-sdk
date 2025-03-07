@@ -169,5 +169,7 @@ if __name__ == "__main__":
     iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", "http://127.0.0.1:8080", "https://{PAAS_DOMAIN}")
     # recommend if got an APIGateway
     # iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", bk_apigateway_url="http://{IAM_APIGATEWAY_URL}")
+    # 多租户用户需要传入bk_tenant_id
+    # iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", bk_apigateway_url="http://{IAM_APIGATEWAY_URL}", bk_tenant_id="{your bk_tenant_id}")
     print("is_allowed: ", iam.is_allowed(request))
     print("query: ", iam.make_filter(request))

@@ -38,7 +38,7 @@ class IAM(object):
     """
 
     def __init__(
-        self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None, api_version="v2"
+        self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None, api_version="v2", bk_tenant_id="default"
     ):
         """
         如果有 APIGateway 且权限中心网关接入, 则可以统一API请求全部走APIGateway
@@ -48,7 +48,7 @@ class IAM(object):
         NOTE: 未来将会下线`没有 APIGateway的用法`
         TODO: 切换后, 所有暴露接口将不再依赖 bk_token/bk_username, 需考虑兼容调用方, 并文档说明
         """
-        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_apigateway_url)
+        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_apigateway_url, bk_tenant_id)
 
         self._api_version = api_version
 

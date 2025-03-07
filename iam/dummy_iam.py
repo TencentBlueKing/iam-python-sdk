@@ -26,8 +26,8 @@ class DummyIAM(object):
     input: object
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host):
-        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host)
+    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host, bk_tenant_id="default"):
+        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_tenant_id)
 
     def _do_policy_query(self, request, with_resources=True):
         return []

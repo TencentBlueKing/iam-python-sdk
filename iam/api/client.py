@@ -34,13 +34,15 @@ class Client(object):
     input: json
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None):
+    def __init__(self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None, bk_tenant_id="default"):
         """
         如果有 APIGateway 且权限中心网关接入, 则可以统一API请求全部走APIGateway
         - 没有APIGateway的用法: Client(app_code, app_secret, bk_iam_host, bk_paas_host)
         - 有APIGateway的用法: Client(app_code, app_secret, bk_apigateway_url)
 
         NOTE: 未来将会下线`没有 APIGateway的用法`
+
+        bk_tenant_id: 多租户模式下的租户id，默认为default，非多租户用户无需关注
         """
         self._app_code = app_code
         self._app_secret = app_secret
@@ -73,6 +75,8 @@ class Client(object):
         if is_api_force_enabled:
             self._extra_url_params["force"] = "true"
 
+        self._bk_tenant_id = bk_tenant_id
+
     def _call_api(self, http_func, host, path, data, headers, timeout=None):
         url = "{host}{path}".format(host=host, path=path)
 
@@ -83,6 +87,8 @@ class Client(object):
             preReq = PreparedRequest()
             preReq.prepare_url(url, self._extra_url_params)
             url = preReq.url
+
+        headers.update({"bk_tenant_id": self._bk_tenant_id})
 
         ok, message, _data = http_func(url, data, headers=headers, timeout=timeout)
 
