@@ -38,7 +38,7 @@ class IAM(object):
     """
 
     def __init__(
-        self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None, api_version="v2", bk_tenant_id="default"
+        self, app_code, app_secret, bk_iam_host=None, bk_apigateway_url=None, api_version="v2", bk_tenant_id="default"
     ):
         """
         如果有 APIGateway 且权限中心网关接入, 则可以统一API请求全部走APIGateway
@@ -48,7 +48,7 @@ class IAM(object):
         NOTE: 未来将会下线`没有 APIGateway的用法`
         TODO: 切换后, 所有暴露接口将不再依赖 bk_token/bk_username, 需考虑兼容调用方, 并文档说明
         """
-        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_apigateway_url, bk_tenant_id)
+        self._client = Client(app_code, app_secret, bk_iam_host, bk_apigateway_url, bk_tenant_id)
 
         self._api_version = api_version
 
@@ -456,7 +456,7 @@ class IAM(object):
 
         return True
 
-    def get_apply_url(self, application, bk_token=None, bk_username=None):
+    def get_apply_url(self, application):
         if isinstance(application, dict):
             data = application
         elif isinstance(application, Application):
@@ -466,49 +466,37 @@ class IAM(object):
         else:
             raise AuthInvalidRequest("application shuld be instance of dict or iam.apply.modles.Application")
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
         # bool, message, url
-        return self._client.get_apply_url(bk_token, bk_username, data)
+        return self._client.get_apply_url(data)
 
-    def grant_resource_creator_actions(self, application, bk_token=None, bk_username=None):
+    def grant_resource_creator_actions(self, application):
         if isinstance(application, dict):
             data = application
         else:
             raise AuthInvalidRequest("application should be instance of dict")
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
         # bool, message, url
-        return self._client.grant_resource_creator_actions(bk_token, bk_username, data)
+        return self._client.grant_resource_creator_actions(data)
 
-    def grant_resource_creator_action_attributes(self, application, bk_token=None, bk_username=None):
+    def grant_resource_creator_action_attributes(self, application):
         if isinstance(application, dict):
             data = application
         else:
             raise AuthInvalidRequest("application should be instance of dict")
-
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
 
         # bool, message
-        return self._client.grant_resource_creator_action_attributes(bk_token, bk_username, data)
+        return self._client.grant_resource_creator_action_attributes(data)
 
-    def grant_batch_resource_creator_actions(self, application, bk_token=None, bk_username=None):
+    def grant_batch_resource_creator_actions(self, application):
         if isinstance(application, dict):
             data = application
         else:
             raise AuthInvalidRequest("application should be instance of dict")
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
         # bool, message, url
-        return self._client.grant_batch_resource_creator_actions(bk_token, bk_username, data)
+        return self._client.grant_batch_resource_creator_actions(data)
 
-    def grant_or_revoke_instance_permission(self, request, bk_token=None, bk_username=None):
+    def grant_or_revoke_instance_permission(self, request):
         if not isinstance(request, ApiAuthRequest):
             raise AuthInvalidRequest("request should be a instance of iam.auth.models.ApiAuthRequest")
 
@@ -516,30 +504,26 @@ class IAM(object):
         data = request.to_dict()
 
         logger.debug("the request: %s", data)
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
 
-        ok, message, policies = self._client.instance_authorization(bk_token, bk_username, data)
+        ok, message, policies = self._client.instance_authorization(data)
         if not ok:
             raise AuthAPIError(message)
         return policies
 
-    def grant_or_revoke_path_permission(self, request, bk_token=None, bk_username=None):
+    def grant_or_revoke_path_permission(self, request):
         if not isinstance(request, ApiAuthRequest):
             raise AuthInvalidRequest("request should be a instance of iam.auth.models.ApiAuthRequest")
         self._validate_request(request)
         data = request.to_dict()
 
         logger.debug("the request: %s", data)
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
 
-        ok, message, policies = self._client.path_authorization(bk_token, bk_username, data)
+        ok, message, policies = self._client.path_authorization(data)
         if not ok:
             raise AuthAPIError(message)
         return policies
 
-    def batch_grant_or_revoke_instance_permission(self, request, bk_token=None, bk_username=None):
+    def batch_grant_or_revoke_instance_permission(self, request):
         if not isinstance(request, ApiBatchAuthRequest):
             raise AuthInvalidRequest("request should be a instance of iam.auth.models.ApiBatchAuthRequest")
 
@@ -547,15 +531,13 @@ class IAM(object):
         data = request.to_dict()
 
         logger.debug("the request: %s", data)
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
 
-        ok, message, policies = self._client.batch_instance_authorization(bk_token, bk_username, data)
+        ok, message, policies = self._client.batch_instance_authorization(data)
         if not ok:
             raise AuthAPIError(message)
         return policies
 
-    def batch_grant_or_revoke_path_permission(self, request, bk_token=None, bk_username=None):
+    def batch_grant_or_revoke_path_permission(self, request):
         if not isinstance(request, ApiBatchAuthRequest):
             raise AuthInvalidRequest("request should be a instance of iam.auth.models.ApiBatchAuthRequest")
 
@@ -563,10 +545,8 @@ class IAM(object):
         data = request.to_dict()
 
         logger.debug("the request: %s", data)
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
 
-        ok, message, policies = self._client.batch_path_authorization(bk_token, bk_username, data)
+        ok, message, policies = self._client.batch_path_authorization(data)
         if not ok:
             raise AuthAPIError(message)
         return policies

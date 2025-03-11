@@ -26,8 +26,8 @@ class DummyIAM(object):
     input: object
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host, bk_tenant_id="default"):
-        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host, bk_tenant_id)
+    def __init__(self, app_code, app_secret, bk_iam_host, bk_tenant_id="default"):
+        self._client = Client(app_code, app_secret, bk_iam_host, bk_tenant_id)
 
     def _do_policy_query(self, request, with_resources=True):
         return []
@@ -196,7 +196,7 @@ class DummyIAM(object):
     def is_basic_auth_allowed(self, system, basic_auth):
         return True
 
-    def get_apply_url(self, application, bk_token=None, bk_username=None):
+    def get_apply_url(self, application):
         if isinstance(application, dict):
             data = application
         elif isinstance(application, Application):
@@ -206,11 +206,8 @@ class DummyIAM(object):
         else:
             raise AuthInvalidRequest("application shuld be instance of dict or iam.apply.modles.Application")
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
         # bool, message, url
-        return self._client.get_apply_url(bk_token, bk_username, data)
+        return self._client.get_apply_url(data)
 
     def grant_resource_creator_actions(self, application, bk_token=None, bk_username=None):
         return True, "success"
@@ -221,31 +218,25 @@ class DummyIAM(object):
     def grant_batch_resource_creator_actions(self, application, bk_token=None, bk_username=None):
         return True, "success"
 
-    def grant_or_revoke_instance_permission(self, request, bk_token=None, bk_username=None):
+    def grant_or_revoke_instance_permission(self, request):
         if not isinstance(request, ApiAuthRequest):
             raise AuthInvalidRequest("request should be a instance of iam.auth.models.ApiAuthRequest")
 
         self._validate_request(request)
         data = request.to_dict()
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
-        ok, message, policies = self._client.instance_authorization(bk_token, bk_username, data)
+        ok, message, policies = self._client.instance_authorization(data)
         if not ok:
             raise AuthAPIError(message)
         return policies
 
-    def grant_or_revoke_path_permission(self, request, bk_token=None, bk_username=None):
+    def grant_or_revoke_path_permission(self, request):
         if not isinstance(request, ApiAuthRequest):
             raise AuthInvalidRequest("request should be a instance of iam.auth.models.ApiAuthRequest")
         self._validate_request(request)
         data = request.to_dict()
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
-        ok, message, policies = self._client.path_authorization(bk_token, bk_username, data)
+        ok, message, policies = self._client.path_authorization(data)
         if not ok:
             raise AuthAPIError(message)
         return policies

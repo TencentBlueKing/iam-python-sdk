@@ -34,7 +34,7 @@ class Client(object):
     input: json
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host=None, bk_paas_host=None, bk_apigateway_url=None, bk_tenant_id="default"):
+    def __init__(self, app_code, app_secret, bk_iam_host=None, bk_apigateway_url=None, bk_tenant_id="default"):
         """
         如果有 APIGateway 且权限中心网关接入, 则可以统一API请求全部走APIGateway
         - 没有APIGateway的用法: Client(app_code, app_secret, bk_iam_host, bk_paas_host)
@@ -54,11 +54,10 @@ class Client(object):
             # replace the host
             self._host = bk_apigateway_url.rstrip("/")
         else:
-            if not (bk_iam_host and bk_paas_host):
-                raise AuthAPIError("init client fail, bk_iam_host and bk_paas_host should not be empty")
+            if not bk_iam_host:
+                raise AuthAPIError("init client fail, bk_iam_host should not be empty")
 
             self._host = bk_iam_host
-            self._bk_paas_host = bk_paas_host
 
         # will add ?debug=true in url, for debug api/policy, show the details
         is_api_debug_enabled = (
@@ -132,29 +131,6 @@ class Client(object):
 
         return self._call_api(http_func, self._host, path, data, headers, timeout=timeout)
 
-    def _call_esb_api(self, http_func, path, data, bk_token, bk_username, timeout=None):
-        """
-        兼容切换到apigateway, 统一后, 这个方法应该去掉
-        """
-        if self._apigateway_on:
-            apigw_path = path.replace("/api/c/compapi/v2/iam/", "/api/v1/open/")
-            if not apigw_path.startswith("/api/v1/open/"):
-                raise AuthAPIError("can't find the matched apigateway path, the esb api path is %s" % path)
-
-            return self._call_apigateway_api(http_func, apigw_path, data, timeout)
-
-        # call esb
-        headers = {}
-        data.update(
-            {
-                "bk_app_code": self._app_code,
-                "bk_app_secret": self._app_secret,
-                "bk_token": bk_token,
-                "bk_username": bk_username,
-            }
-        )
-        return self._call_api(http_func, self._bk_paas_host, path, data, headers, timeout=timeout)
-
     # ---------- system
     def add_system(self, data):
         # data.id required
@@ -218,30 +194,30 @@ class Client(object):
         return ok, message
 
     # return resource instance creator to iam, esb needed.
-    def grant_resource_creator_actions(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/resource_creator_action/"
+    def grant_resource_creator_actions(self, data):
+        path = "/api/v1/open/authorization/resource_creator_action/"
 
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+        ok, message, _data = self._call_apigateway_api(http_post, path, data, timeout=5)
         if not ok:
             return False, message
 
         return True, "success"
 
     # return resource instance creator action attribute to iam, esb needed.
-    def grant_resource_creator_action_attributes(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/resource_creator_action_attribute/"
+    def grant_resource_creator_action_attributes(self, data):
+        path = "/api/v1/open/authorization/resource_creator_action_attribute/"
 
-        ok, message, data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+        ok, message, data = self._call_apigateway_api(http_post, path, data, timeout=5)
         if not ok:
             return False, message
 
         return True, "success"
 
     # return resource instance creator to iam, esb needed.
-    def grant_batch_resource_creator_actions(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/batch_resource_creator_action/"
+    def grant_batch_resource_creator_actions(self, data):
+        path = "/api/v1/open/authorization/batch_resource_creator_action/"
 
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+        ok, message, _data = self._call_apigateway_api(http_post, path, data, timeout=5)
         if not ok:
             return False, message
 
@@ -355,39 +331,39 @@ class Client(object):
         return True, "success", _data.get("token", "")
 
     # apply
-    def get_apply_url(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/application/"
+    def get_apply_url(self, data):
+        path = "/api/v1/open/application/"
 
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+        ok, message, _data = self._call_apigateway_api(http_post, path, data, timeout=5)
         if not ok:
             return False, message, ""
 
         return True, "success", _data.get("url", "")
 
-    def instance_authorization(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/instance/"
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+    def instance_authorization(self, data):
+        path = "/api/v1/open/authorization/instance/"
+        ok, message, _data = self._call_apigateway_api(http_post, path, data, timeout=5)
         if not ok:
             return False, message, ""
         return True, "success", _data.get("token", "")
 
-    def batch_instance_authorization(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/batch_instance/"
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+    def batch_instance_authorization(self, data):
+        path = "/api/v1/open/authorization/batch_instance/"
+        ok, message, _data = self._call_apigateway_api(http_post, path, data, timeout=5)
         if not ok:
             return False, message, ""
         return True, "success", _data
 
-    def path_authorization(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/path/"
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+    def path_authorization(self, data):
+        path = "/api/v1/open/authorization/path/"
+        ok, message, _data = self._call_apigateway_api(http_post, path, data, timeout=5)
         if not ok:
             return False, message, ""
         return True, "success", _data.get("token", "")
 
-    def batch_path_authorization(self, bk_token, bk_username, data):
-        path = "/api/c/compapi/v2/iam/authorization/batch_path/"
-        ok, message, _data = self._call_esb_api(http_post, path, data, bk_token, bk_username, timeout=5)
+    def batch_path_authorization(self, data):
+        path = "/api/v1/open/authorization/batch_path/"
+        ok, message, _data = self._call_apigateway_api(http_post, path, data, timeout=5)
         if not ok:
             return False, message, ""
         return True, "success", _data

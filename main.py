@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     print("the request: ", request.to_dict())
 
-    iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", "http://127.0.0.1:8080", "https://{PAAS_DOMAIN}")
+    iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", "http://127.0.0.1:8080")
     # recommend if got an APIGateway
     # iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", bk_apigateway_url="http://{IAM_APIGATEWAY_URL}")
     # 多租户用户需要传入bk_tenant_id
