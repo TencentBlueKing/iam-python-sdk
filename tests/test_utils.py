@@ -90,7 +90,7 @@ def test_gen_perms_apply_data():
                     ],
                 )
 
-                # assert data
+    # assert data
     assert data == {
         "system_id": "test_system",
         "system_name": "test_system_name",
@@ -102,8 +102,8 @@ def test_gen_perms_apply_data():
                     {
                         "system_id": "test_system",
                         "system_name": "test_system_name",
-                        "type": "r3",
-                        "type_name": "r3_type",
+                        "type": "r1",
+                        "type_name": "r1_type",
                         "instances": [
                             [
                                 {
@@ -112,7 +112,15 @@ def test_gen_perms_apply_data():
                                     "id": "r1id",
                                     "name": "r1n"
                                 }
-                            ],
+                            ]
+                        ]
+                    },
+                    {
+                        "system_id": "test_system",
+                        "system_name": "test_system_name",
+                        "type": "r2",
+                        "type_name": "r2_type",
+                        "instances": [
                             [
                                 {
                                     "type": "r2",
@@ -120,7 +128,15 @@ def test_gen_perms_apply_data():
                                     "id": "r2id",
                                     "name": ""
                                 }
-                            ],
+                            ]
+                        ]
+                    },
+                    {
+                        "system_id": "test_system",
+                        "system_name": "test_system_name",
+                        "type": "r3",
+                        "type_name": "r3_type",
+                        "instances": [
                             [
                                 {
                                     "type": "r3",
@@ -161,8 +177,8 @@ def test_gen_perms_apply_data():
                     {
                         "system_id": "test_system",
                         "system_name": "test_system_name",
-                        "type": "r3",
-                        "type_name": "r3_type",
+                        "type": "r1",
+                        "type_name": "r1_type",
                         "instances": [
                             [
                                 {
@@ -174,19 +190,27 @@ def test_gen_perms_apply_data():
                             ],
                             [
                                 {
-                                    "type": "r3",
-                                    "type_name": "r3_type",
-                                    "id": "r3id",
-                                    "name": ""
-                                }
-                            ],
-                            [
-                                {
                                     "type": "r1",
                                     "type_name": "r1_type",
                                     "id": "r1id",
                                     "name": "r1n"
                                 }
+                            ]
+                        ]
+                    },
+                    {
+                        "system_id": "test_system",
+                        "system_name": "test_system_name",
+                        "type": "r3",
+                        "type_name": "r3_type",
+                        "instances": [
+                            [
+                                {
+                                    "type": "r3",
+                                    "type_name": "r3_type",
+                                    "id": "r3id",
+                                    "name": ""
+                                }
                             ],
                             [
                                 {
@@ -196,19 +220,27 @@ def test_gen_perms_apply_data():
                                     "name": ""
                                 }
                             ],
+                            [
+                                {
+                                    "type": "r3",
+                                    "type_name": "r3_type",
+                                    "id": "r3id",
+                                    "name": ""
+                                }
+                            ]
+                        ]
+                    },
+                    {
+                        "system_id": "test_system",
+                        "system_name": "test_system_name",
+                        "type": "r2",
+                        "type_name": "r2_type",
+                        "instances": [
                             [
                                 {
                                     "type": "r2",
                                     "type_name": "r2_type",
                                     "id": "r2id",
-                                    "name": ""
-                                }
-                            ],
-                            [
-                                {
-                                    "type": "r3",
-                                    "type_name": "r3_type",
-                                    "id": "r3id",
                                     "name": ""
                                 }
                             ]

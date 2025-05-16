@@ -9,9 +9,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-
-
-from collections import OrderedDict
+import itertools
+from collections import OrderedDict, defaultdict
 
 from . import meta
 
@@ -61,51 +60,60 @@ def gen_perms_apply_data(system, subject, action_to_resources_list):
             for system_id, resources in system_resources.items():
                 system_resources_list.setdefault(system_id, []).append(resources)
 
+        # 2. aggregate resources by resource type, generate related_resource_type
         related_resource_types = []
         for system_id, resources_list in system_resources_list.items():
-            # get resource type from last resource in resources
-            a_resource = resources_list[0][-1]
-            resource_types = {
-                "system_id": system_id,
-                "system_name": meta.get_system_name(system_id),
-                "type": a_resource.type,
-                "type_name": meta.get_resource_name(system_id, a_resource.type),
-            }
-            instances = []
+            if not resources_list:
+                continue
 
-            for resources in resources_list:
+            # aggregate resources by resource type
+            resource_type__resources = defaultdict(list)
+            for resource in list(itertools.chain(*resources_list)):
+                resource_type__resources[resource.type].append(resource)
+
+            # get the list of resource instances of the same type
+            for __, resources in resource_type__resources.items():
+                a_resource = resources[0]
+                resource_types = {
+                    "system_id": system_id,
+                    "system_name": meta.get_system_name(system_id),
+                    "type": a_resource.type,
+                    "type_name": meta.get_resource_name(system_id, a_resource.type),
+                }
+                instances = []
+
+                # arrange instances according to topo level
                 for resource in resources:
                     inst_item = []
-                    topo_path = None
-
-                    if resource.attribute:
-                        topo_path = resource.attribute.get("_bk_iam_path_")
-
-                    if topo_path:
-                        for part in topo_path[1:-1].split("/"):
-                            # NOTE: old _bk_iam_path_ is like /set,1/host,2/
-                            # while the new _bk_iam_path_ is like /bk_cmdb,set,1/bk_cmdb,host,2/
-                            node_parts = part.split(",")
-                            # NOTE: topo resources should be considered to belong to different systems
-                            rsystem, rtype, rid = system_id, "", ""
-                            if len(node_parts) == 2:
-                                rtype, rid = node_parts[0], node_parts[1]
-                            elif len(node_parts) == 3:
-                                rsystem, rtype, rid = node_parts[0], node_parts[1], node_parts[2]
-                                # NOTE: currently, keep the name of /bk_cmdb,set,1/ same as /set,1/
-                                part = ",".join(node_parts[1:])
-                            else:
-                                raise Exception("Invalid _bk_iam_path_: %s" % topo_path)
-
-                            inst_item.append(
-                                {
-                                    "type": rtype,
-                                    "type_name": meta.get_resource_name(rsystem, rtype),
-                                    "id": rid,
-                                    "name": part,
-                                }
-                            )
-
+                    topo_path = []
+                    # get the topo level of the resource
+                    if resource.attribute and resource.attribute.get("_bk_iam_path_"):
+                        bk_iam_path = resource.attribute["_bk_iam_path_"]
+                        topo_path = bk_iam_path[1:-1].split("/")
+                    # append paernt topo instance
+                    for part in topo_path:
+                        # NOTE: old _bk_iam_path_ is like /set,1/host,2/
+                        # while the new _bk_iam_path_ is like /bk_cmdb,set,1/bk_cmdb,host,2/
+                        node_parts = part.split(",")
+                        # NOTE: topo resources should be considered to belong to different systems
+                        rsystem, rtype, rid = system_id, "", ""
+                        if len(node_parts) == 2:
+                            rtype, rid = node_parts[0], node_parts[1]
+                        elif len(node_parts) == 3:
+                            rsystem, rtype, rid = node_parts[0], node_parts[1], node_parts[2]
+                            # NOTE: currently, keep the name of /bk_cmdb,set,1/ same as /set,1/
+                            part = ",".join(node_parts[1:])
+                        else:
+                            raise Exception("Invalid _bk_iam_path_: %s" % topo_path)
+                        inst_item.append(
+                            {
+                                "type": rtype,
+                                "type_name": meta.get_resource_name(rsystem, rtype),
+                                "id": rid,
+                                "name": part,
+                            }
+                        )
+                    # lastly, append self
                     inst_item.append(
                         {
                             "type": resource.type,
@@ -114,11 +122,10 @@ def gen_perms_apply_data(system, subject, action_to_resources_list):
                             "name": resource.attribute.get("name", "") if resource.attribute else "",
                         }
                     )
-
                     instances.append(inst_item)
 
-            resource_types["instances"] = instances
-            related_resource_types.append(resource_types)
+                resource_types["instances"] = instances
+                related_resource_types.append(resource_types)
 
         action["related_resource_types"] = related_resource_types
         actions.append(action)
