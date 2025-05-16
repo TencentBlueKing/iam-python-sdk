@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 TencentBlueKing is pleased to support the open source community by making
-蓝鲸智云-权限中心Python SDK(iam-python-sdk) available.
+蓝鲸智云 - 权限中心 Python SDK(iam-python-sdk) available.
 Copyright (C) 2017-2021 THL A29 Limited, a Tencent company. All rights reserved.
 Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://opensource.org/licenses/MIT
@@ -18,8 +18,8 @@ DONE:
 1. 实现 and/or
 2. 实现所有类型的操作符
 3. 实现递归求值
-4. 加入模板方法限制, 确保每个operator实现eval
-5. 加入Enum类, 去除字面量
+4. 加入模板方法限制，确保每个 operator 实现 eval
+5. 加入 Enum 类，去除字面量
 """
 
 from __future__ import print_function
@@ -166,8 +166,13 @@ if __name__ == "__main__":
 
     print("the request: ", request.to_dict())
 
-    iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", "http://127.0.0.1:8080", "https://{PAAS_DOMAIN}")
-    # recommend if got an APIGateway
-    # iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", bk_apigateway_url="http://{IAM_APIGATEWAY_URL}")
+    iam = IAM("bk_paas", "2353e89a-10a2-4f30-9f6b-8973e9cd1404", bk_apigateway_url="http://{IAM_APIGATEWAY_URL}")
+    # Tenant Enabled
+    # iam = IAM(
+    #     "bk_paas",
+    #     "2353e89a-10a2-4f30-9f6b-8973e9cd1404",
+    #     bk_apigateway_url="http://{IAM_APIGATEWAY_URL}",
+    #     bk_tenant_id="test_tenant_id",
+    # )
     print("is_allowed: ", iam.is_allowed(request))
     print("query: ", iam.make_filter(request))

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 TencentBlueKing is pleased to support the open source community by making
-蓝鲸智云-权限中心Python SDK(iam-python-sdk) available.
+蓝鲸智云 - 权限中心 Python SDK(iam-python-sdk) available.
 Copyright (C) 2017-2021 THL A29 Limited, a Tencent company. All rights reserved.
 Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://opensource.org/licenses/MIT
@@ -26,8 +26,8 @@ class DummyIAM(object):
     input: object
     """
 
-    def __init__(self, app_code, app_secret, bk_iam_host, bk_paas_host):
-        self._client = Client(app_code, app_secret, bk_iam_host, bk_paas_host)
+    def __init__(self, app_code, app_secret, bk_apigateway_url, bk_tenant_id=""):
+        self._client = Client(app_code, app_secret, bk_apigateway_url, bk_tenant_id)
 
     def _do_policy_query(self, request, with_resources=True):
         return []
@@ -55,7 +55,7 @@ class DummyIAM(object):
 
         for resource in resources:
             # only local resource need to be calculated
-            # 跨系统资源依赖的策略在服务端就计算完了, 策略表达式中只会存在本系统的
+            # 跨系统资源依赖的策略在服务端就计算完了，策略表达式中只会存在本系统的
             if only_local and (resource.system != system):
                 continue
 
@@ -65,7 +65,7 @@ class DummyIAM(object):
 
             resource_id_list.append((resource.type, resource.id))
 
-        # 如果只有一个本地资源, 直接返回不带类型的ID;
+        # 如果只有一个本地资源，直接返回不带类型的 ID;
         # [("flow", "1")]   => "1"
         # 如果存在层级资源 返回 {type},{id}/{type2},{id2}
         # [("cluster", "a"), ("area", "b")) =>  "cluster,a/area,b"
@@ -105,7 +105,7 @@ class DummyIAM(object):
             raise AuthInvalidParam("resources should be list of iam.auth.models.Resource")
 
     def _validate_resources_list_same_local_only(self, system, resources_list):
-        # 校验, resources_list中只能是本地同一类的资源
+        # 校验，resources_list 中只能是本地同一类的资源
         resource_types = {}
         for rs in resources_list:
             for r in rs:
@@ -126,27 +126,27 @@ class DummyIAM(object):
     def is_allowed(self, request):
         """
         单个资源是否有权限校验
-        request中会带resource到IAM, IAM会进行两阶段计算, 即resources也会参与到计算中
+        request 中会带 resource 到 IAM, IAM 会进行两阶段计算，即 resources 也会参与到计算中
 
-        支持:
-        - 本地资源 resources中只有本地资源
-        - 跨系统资源依赖 resources中有本地也有远程资源 (此时resoruces一定要传, 因为需要IAM帮助获取跨系统资源)
+        支持：
+        - 本地资源 resources 中只有本地资源
+        - 跨系统资源依赖 resources 中有本地也有远程资源 (此时 resoruces 一定要传，因为需要 IAM 帮助获取跨系统资源)
         """
         return True
 
     def batch_is_allowed(self, request, resources_list):
         """
         多个资源是否有权限校验
-        request中不会带resource到IAM, IAM不会会进行两阶段计算, 直接返回system+action+subejct的所有策略
+        request 中不会带 resource 到 IAM, IAM 不会会进行两阶段计算，直接返回 system+action+subejct 的所有策略
         然后逐一计算
 
-        - 一次策略查询, 多次计算
+        - 一次策略查询，多次计算
 
-        支持:
-        - 本地资源 resources中只有本地资源
+        支持：
+        - 本地资源 resources 中只有本地资源
         - **不支持**跨系统资源依赖
         """
-        # NOTE: 不向服务端传任何resource
+        # NOTE: 不向服务端传任何 resource
         result = {}
         for resources in resources_list:
             _, resource_id = self._build_object_set(request.system, resources, only_local=False)
@@ -155,12 +155,12 @@ class DummyIAM(object):
 
     def resource_multi_actions_allowed(self, request):
         """
-        单个资源多个action是否有权限校验
-        request中会带resource到IAM, IAM会进行两阶段计算, 即resources也会参与到计算中
+        单个资源多个 action 是否有权限校验
+        request 中会带 resource 到 IAM, IAM 会进行两阶段计算，即 resources 也会参与到计算中
 
-        支持:
-        - 本地资源 resources中只有本地资源
-        - 跨系统资源依赖 resources中有本地也有远程资源 (此时resoruces一定要传, 因为需要IAM帮助获取跨系统资源)
+        支持：
+        - 本地资源 resources 中只有本地资源
+        - 跨系统资源依赖 resources 中有本地也有远程资源 (此时 resoruces 一定要传，因为需要 IAM 帮助获取跨系统资源)
         """
         actions_allowed = {}
         for a in request.to_dict()["actions"]:
@@ -170,11 +170,11 @@ class DummyIAM(object):
 
     def batch_resource_multi_actions_allowed(self, request, resources_list):
         """
-        批量资源多个action是否有权限校验
-        request中会带resource到IAM, IAM会进行两阶段计算, 即resources也会参与到计算中
+        批量资源多个 action 是否有权限校验
+        request 中会带 resource 到 IAM, IAM 会进行两阶段计算，即 resources 也会参与到计算中
 
-        支持:
-        - 本地资源 resources中只有本地资源
+        支持：
+        - 本地资源 resources 中只有本地资源
         - **不支持**跨系统资源依赖
         """
         resources_actions_perms = {}
@@ -196,7 +196,7 @@ class DummyIAM(object):
     def is_basic_auth_allowed(self, system, basic_auth):
         return True
 
-    def get_apply_url(self, application, bk_token=None, bk_username=None):
+    def get_apply_url(self, application):
         if isinstance(application, dict):
             data = application
         elif isinstance(application, Application):
@@ -206,46 +206,37 @@ class DummyIAM(object):
         else:
             raise AuthInvalidRequest("application shuld be instance of dict or iam.apply.modles.Application")
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
         # bool, message, url
-        return self._client.get_apply_url(bk_token, bk_username, data)
+        return self._client.get_apply_url(data)
 
-    def grant_resource_creator_actions(self, application, bk_token=None, bk_username=None):
+    def grant_resource_creator_actions(self, application):
         return True, "success"
 
-    def grant_resource_creator_action_attributes(self, application, bk_token=None, bk_username=None):
+    def grant_resource_creator_action_attributes(self, application):
         return True, "success"
 
-    def grant_batch_resource_creator_actions(self, application, bk_token=None, bk_username=None):
+    def grant_batch_resource_creator_actions(self, application):
         return True, "success"
 
-    def grant_or_revoke_instance_permission(self, request, bk_token=None, bk_username=None):
+    def grant_or_revoke_instance_permission(self, request):
         if not isinstance(request, ApiAuthRequest):
             raise AuthInvalidRequest("request should be a instance of iam.auth.models.ApiAuthRequest")
 
         self._validate_request(request)
         data = request.to_dict()
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
-        ok, message, policies = self._client.instance_authorization(bk_token, bk_username, data)
+        ok, message, policies = self._client.instance_authorization(data)
         if not ok:
             raise AuthAPIError(message)
         return policies
 
-    def grant_or_revoke_path_permission(self, request, bk_token=None, bk_username=None):
+    def grant_or_revoke_path_permission(self, request):
         if not isinstance(request, ApiAuthRequest):
             raise AuthInvalidRequest("request should be a instance of iam.auth.models.ApiAuthRequest")
         self._validate_request(request)
         data = request.to_dict()
 
-        if not (bk_token or bk_username):
-            raise AuthInvalidRequest("bk_token and bk_username can not both be empty")
-
-        ok, message, policies = self._client.path_authorization(bk_token, bk_username, data)
+        ok, message, policies = self._client.path_authorization(data)
         if not ok:
             raise AuthAPIError(message)
         return policies

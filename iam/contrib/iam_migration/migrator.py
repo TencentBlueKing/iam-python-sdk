@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 TencentBlueKing is pleased to support the open source community by making
-蓝鲸智云-权限中心Python SDK(iam-python-sdk) available.
+蓝鲸智云 - 权限中心 Python SDK(iam-python-sdk) available.
 Copyright (C) 2017-2021 THL A29 Limited, a Tencent company. All rights reserved.
 Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://opensource.org/licenses/MIT
@@ -38,15 +38,9 @@ class IAMMigrator(object):
         self._bk_app_secret = settings.SECRET_KEY
 
     def migrate(self):
-        iam_host = ""
-        USE_APIGATEWAY = getattr(settings, "BK_IAM_USE_APIGATEWAY", False)
-        if USE_APIGATEWAY:
-            do_migrate.enable_use_apigateway()
-            iam_host = getattr(settings, "BK_IAM_APIGATEWAY_URL", "")
-            if iam_host == "":
-                raise exceptions.MigrationFailError("settings.BK_IAM_APIGATEWAY_URL should be set")
-        else:
-            iam_host = settings.BK_IAM_INNER_HOST
+        iam_host = getattr(settings, "BK_IAM_APIGATEWAY_URL", "")
+        if iam_host == "":
+            raise exceptions.MigrationFailError("settings.BK_IAM_APIGATEWAY_URL should be set")
 
         # only trigger migrator at db migrate
         if "migrate" not in sys.argv:
