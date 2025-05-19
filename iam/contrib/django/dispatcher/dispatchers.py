@@ -121,7 +121,7 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
         opts = {"language": request.META.get("HTTP_BLUEKING_LANGUAGE", "zh-cn")}
         # tenant_id is required for multi-tenant
         if "HTTP_X_BK_TENANT_ID" in request.META:
-            opts["tenant_id"] = request.META["HTTP_X_BK_TENANT_ID"]
+            opts["bk_tenant_id"] = request.META["HTTP_X_BK_TENANT_ID"]
 
         return opts
 
