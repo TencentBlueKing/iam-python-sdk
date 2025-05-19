@@ -118,10 +118,12 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
             return fail_response(500, str(e), request_id)
 
     def _get_options(self, request):
-        return {
-            "tenant_id": request.META.get("HTTP_X_BK_TENANT_ID", ""),
-            "language": request.META.get("HTTP_BLUEKING_LANGUAGE", "zh-cn"),
-        }
+        opts = {"language": request.META.get("HTTP_BLUEKING_LANGUAGE", "zh-cn")}
+        # tenant_id is required for multi-tenant
+        if "HTTP_X_BK_TENANT_ID" in request.META:
+            opts["tenant_id"] = request.META["HTTP_X_BK_TENANT_ID"]
+
+        return opts
 
     def _dispatch_list_attr(self, request, data, request_id):
         options = self._get_options(request)
