@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 TencentBlueKing is pleased to support the open source community by making
-蓝鲸智云-权限中心Python SDK(iam-python-sdk) available.
+蓝鲸智云 - 权限中心 Python SDK(iam-python-sdk) available.
 Copyright (C) 2017-2021 THL A29 Limited, a Tencent company. All rights reserved.
 Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://opensource.org/licenses/MIT
@@ -90,8 +90,9 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
         method = data.get("method")
         resource_type = data.get("type")
         if not (method and resource_type):
-            logger.error("resource request(%s) failed with invalid data: %s. method and type required",
-                         request_id, data)
+            logger.error(
+                "resource request(%s) failed with invalid data: %s. method and type required", request_id, data
+            )
             return fail_response(400, "method and type is required field", request_id)
 
         # check resource type
@@ -117,7 +118,12 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
             return fail_response(500, str(e), request_id)
 
     def _get_options(self, request):
-        return {"language": request.META.get("HTTP_BLUEKING_LANGUAGE", "zh-cn")}
+        opts = {"language": request.META.get("HTTP_BLUEKING_LANGUAGE", "zh-cn")}
+        # tenant_id is required for multi-tenant
+        if "HTTP_X_BK_TENANT_ID" in request.META:
+            opts["tenant_id"] = request.META["HTTP_X_BK_TENANT_ID"]
+
+        return opts
 
     def _dispatch_list_attr(self, request, data, request_id):
         options = self._get_options(request)

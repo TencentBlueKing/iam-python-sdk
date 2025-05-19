@@ -129,10 +129,11 @@ def http_delete(url, data, headers=None, verify=False, cert=None, timeout=None, 
 
 
 class Client(object):
-    def __init__(self, app_code, app_secret, bk_apigateway_url):
+    def __init__(self, app_code, app_secret, bk_apigateway_url, tenant_id=""):
         self.app_code = app_code
         self.app_secret = app_secret
         self.bk_apigateway_url = bk_apigateway_url.rstrip("/")
+        self.tenant_id = tenant_id
         self.system_id_set = set()
         self.resource_id_set = set()
         self.action_id_set = set()
@@ -142,6 +143,8 @@ class Client(object):
         headers = {
             "X-Bkapi-Authorization": json.dumps({"bk_app_code": self.app_code, "bk_app_secret": self.app_secret}),
         }
+        if self.tenant_id:
+            headers["X-Bk-Tenant-Id"] = self.tenant_id
 
         url = "{host}{path}".format(host=self.bk_apigateway_url, path=path)
         ok, _data = http_func(url, data, headers=headers)
@@ -558,7 +561,7 @@ def api_ping(bk_apigateway_url):
     return ok, data
 
 
-def do_migrate(data, bk_apigateway_url=BK_APIGATEWAY_URL, app_code=APP_CODE, app_secret=APP_SECRET):
+def do_migrate(data, bk_apigateway_url=BK_APIGATEWAY_URL, app_code=APP_CODE, app_secret=APP_SECRET, tenant_id=""):
     system_id = data.get("system_id")
     if not system_id:
         print("invald json. [system_id] required, and should not be empty")
@@ -571,7 +574,7 @@ def do_migrate(data, bk_apigateway_url=BK_APIGATEWAY_URL, app_code=APP_CODE, app
 
     print("do migrate")
 
-    client = Client(app_code, app_secret, bk_apigateway_url)
+    client = Client(app_code, app_secret, bk_apigateway_url, tenant_id=tenant_id)
 
     # 1. query all data of the system
     system_ids, resource_type_ids, action_ids, instance_selection_ids = client.query_all_models(system_id)
@@ -623,6 +626,7 @@ if __name__ == "__main__":
     )
     p.add_argument("-a", action="store", dest="app_code", help="app code", required=True)
     p.add_argument("-s", action="store", dest="app_secret", help="app secret", required=True)
+    p.add_argument("--tenant_id", action="store", dest="tenant_id", help="tenant id", default="", required=False)
 
     args = p.parse_args()
 
@@ -630,6 +634,7 @@ if __name__ == "__main__":
     APP_CODE = args.app_code
     APP_SECRET = args.app_secret
     BK_APIGATEWAY_URL = args.bk_apigateway_url.rstrip("/")
+    tenant_id = args.tenant_id
 
     # test ping
     ok, _ = api_ping(BK_APIGATEWAY_URL)
@@ -644,7 +649,7 @@ if __name__ == "__main__":
     if not data:
         exit(1)
 
-    ok = do_migrate(data, BK_APIGATEWAY_URL, APP_CODE, APP_SECRET)
+    ok = do_migrate(data, BK_APIGATEWAY_URL, APP_CODE, APP_SECRET, tenant_id=tenant_id)
     if not ok:
         print("do migrate [%s] fail" % data_file)
         exit(1)
