@@ -9,7 +9,7 @@ long_description = "bk-iam python sdk"
 requires = [
     "six>=1.11.0",
     "cachetools>=3.1.1,<6.0",
-    "requests",
+    "requests>=2.16.0",
     "curlify==2.2.1",
 ]
 
