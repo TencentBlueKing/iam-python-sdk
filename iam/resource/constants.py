@@ -23,3 +23,6 @@ class SchemaSpecificType(object):
     NUMBER = "number"
     OBJECT = "object"
     STRING = "string"
+
+
+KEYWORD_IAM_TOPO_PATH = "_iam_topo_path_"

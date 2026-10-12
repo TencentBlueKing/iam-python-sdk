@@ -50,7 +50,10 @@ class ObjectSet(object):
             del self._data[_type]
 
     def get(self, key):
-        parts = key.split(".")
+        # The first segment is the resource type. Attribute IDs may themselves
+        # contain dots (for example, dynamic_attr.table.<id>.<field>), so only
+        # split on the first dot and preserve the complete attribute ID.
+        parts = key.split(".", 1)
         if len(parts) != 2:
             return None
 

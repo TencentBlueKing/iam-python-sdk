@@ -23,6 +23,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from iam.contrib.django.dispatcher.exceptions import InvalidPageException, KeywordTooShortException
 from iam.exceptions import AuthInvalidOperation
+from iam.resource.constants import KEYWORD_IAM_TOPO_PATH
 from iam.resource.dispatcher import ResourceApiDispatcher
 from iam.resource.provider import ResourceProvider
 from iam.resource.utils import get_filter_obj, get_page_obj
@@ -127,6 +128,8 @@ class DjangoBasicResourceApiDispatcher(ResourceApiDispatcher):
 
     def _dispatch_list_attr(self, request, data, request_id):
         options = self._get_options(request)
+        if KEYWORD_IAM_TOPO_PATH in data:
+            options[KEYWORD_IAM_TOPO_PATH] = data[KEYWORD_IAM_TOPO_PATH]
 
         provider = self._provider[data["type"]]
 

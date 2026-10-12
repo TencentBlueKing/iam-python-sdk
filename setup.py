@@ -29,7 +29,8 @@ setuptools.setup(
     project_urls={
         "Bug Tracker": "https://github.com/TencentBlueKing/iam-python-sdk/issues",
     },
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=("tests", "tests.*")),
+    package_data={"iam.contrib.iam_migration": ["templates/*.tmpl"]},
     install_requires=requires,
     classifiers=[
         "Programming Language :: Python :: 3.6",

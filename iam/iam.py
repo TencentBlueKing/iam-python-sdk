@@ -73,7 +73,12 @@ class IAM(object):
             data["resources"] = []
 
         if self._api_version == "v2":
-            ok, message, action_policies = self._client.v2_policy_query_by_actions(request.system, data)
+            if with_resources:
+                ok, message, action_policies = self._client.v2_policy_query_by_actions(request.system, data)
+            else:
+                ok, message, action_policies = self._client.v2_policy_query_by_actions_without_resources(
+                    request.system, data
+                )
         else:
             ok, message, action_policies = self._client.policy_query_by_actions(data)
         if not ok:
@@ -352,10 +357,11 @@ class IAM(object):
         logger.debug("the return policies: %s", action_policies)
         if not action_policies:
             logger.debug("no return policies, will reject all perms")
-            for resource in resources_list:
+            for resources in resources_list:
+                _, resource_id = self._build_object_set(request.system, resources, only_local=False)
                 for a in data["actions"]:
                     action = a["id"]
-                    resources_actions_perms.setdefault(resource.id, {})[action] = False
+                    resources_actions_perms.setdefault(resource_id, {})[action] = False
             return resources_actions_perms
 
         # 4. calculate perms

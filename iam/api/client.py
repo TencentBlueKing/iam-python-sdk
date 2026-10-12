@@ -291,6 +291,11 @@ class Client(object):
         ok, message, data = self._call_apigateway_api(http_post, path, data)
         return ok, message, data
 
+    def v2_policy_query_by_actions_without_resources(self, system_id, data):
+        path = f"/api/v2/policy/systems/{system_id}/query_by_actions_without_resources/"
+        ok, message, data = self._call_apigateway_api(http_post, path, data)
+        return ok, message, data
+
     def get_token(self, system_id):
         path = "/api/v1/model/systems/{system_id}/token".format(system_id=system_id)
         ok, message, _data = self._call_apigateway_api(http_get, path, {})

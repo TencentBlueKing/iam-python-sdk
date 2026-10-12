@@ -1,6 +1,13 @@
 版本日志
 ===============
 
+# v2.0.4-alpha
+
+- add: ABAC 动态属性 `list_attr` 支持 `_iam_topo_path_` 透传
+- add: 无资源的多 action 策略查询使用 `query_by_actions_without_resources`
+- fix: 无策略时批量资源多 action 鉴权稳定返回 False
+- fix: 动态属性 ID 包含多个点号时表达式鉴权失败
+
 # v1.3.5
 
 - fix: gen_perms_apply_data拓扑资源按照资源类型聚合
